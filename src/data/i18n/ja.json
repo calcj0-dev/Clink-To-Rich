@@ -5,6 +5,10 @@
     "nameEn": "Clink to Rich",
     "tagline": "同じお金がくっつくと、1つ上のお金に。"
   },
+  "num": {
+    "oku": "億",
+    "man": "万"
+  },
   "title": {
     "start": "はじめる",
     "how": "遊び方",

@@ -1,0 +1,67 @@
+// 表示と判定（設計書 3章）。参照実装 sim/rules.mjs と同じ結果にする（T-02）
+
+import type { StockColorStep, TitleRule } from './types';
+
+/** 金額の表示に使う言葉（ja.json の num と、通貨の symbol・locale） */
+export type MoneyUnits = { oku: string; man: string; symbol: string; locale: string };
+
+/** 金額の表示：1億以上「3億2,000万円」、1万以上「2,483万円」、それ未満「9,800円」（万の下は切り捨て） */
+export function yenText(yen: number, u: MoneyUnits): string {
+  yen = Math.floor(yen);
+  const f = (n: number) => n.toLocaleString(u.locale);
+  if (yen >= 1e8) {
+    const oku = Math.floor(yen / 1e8);
+    const man = Math.floor((yen % 1e8) / 1e4);
+    return `${f(oku)}${u.oku}${man ? f(man) + u.man : ''}${u.symbol}`;
+  }
+  if (yen >= 1e4) return `${f(Math.floor(yen / 1e4))}${u.man}${u.symbol}`;
+  return `${f(yen)}${u.symbol}`;
+}
+
+/** 株価の丸め：上 sigDigits けた、最小 minUnit 円 */
+export function roundPrice(p: number, { minUnit, sigDigits }: { minUnit: number; sigDigits: number }): number {
+  p = Math.max(p, minUnit);
+  const unit = Math.max(minUnit, 10 ** (Math.floor(Math.log10(p)) - (sigDigits - 1)));
+  return Math.round(p / unit) * unit;
+}
+
+/** 億の玉の半径：1億ふえるごとに 1億円の玉の半径 × growPerUnit。上限 maxRadius */
+export function okuRadius(oku: number, baseRadius: number, top: { growPerUnit: number; maxRadius: number }): number {
+  return Math.min(baseRadius * (1 + top.growPerUnit * (oku - 1)), top.maxRadius);
+}
+
+/** 株の色：今の株価 ÷ 始まりの株価 が fromRatio 以上の一番上の段 */
+export function stockColor(price: number, startPrice: number, steps: StockColorStep[]): StockColorStep {
+  const r = price / startPrice;
+  let hit = steps[0]!;
+  for (const s of steps) if (r >= s.fromRatio) hit = s;
+  return hit;
+}
+
+export type TitleInput = { total: number; sharesBought: number; boughtDrops: number[]; crashDrops: number[] };
+
+/** 称号：config.titles を上から順に見て最初に当てはまったものの id */
+export function titleFor(play: TitleInput, titles: TitleRule[], amounts: Record<string, number>): string {
+  for (const t of titles) {
+    if (t.rule === 'totalAtLeast' && play.total >= (amounts[t.amount ?? ''] ?? Infinity)) return t.id;
+    if (t.rule === 'noStock' && play.sharesBought === 0) return t.id;
+    if (
+      t.rule === 'boughtBeforeCrash' &&
+      play.crashDrops.some((c) => play.boughtDrops.some((b) => b <= c && c - b <= (t.withinDrops ?? 0)))
+    )
+      return t.id;
+    if (t.rule === 'else') return t.id;
+  }
+  throw new Error('no title matched');
+}
+
+/** 現金＝箱の中のお金の合計 − 株に使った額 */
+export const cashOf = (ballsValue: number, spent: number): number => ballsValue - spent;
+
+export type Holding = { spent: number; shares: number };
+
+/** 「株を買う」：現金 ≥ 株価なら1株。お金の玉は消えない → 新しい { spent, shares }。買えなければ null */
+export function buyOne(state: Holding, ballsValue: number, price: number): Holding | null {
+  if (cashOf(ballsValue, state.spent) < price) return null;
+  return { spent: state.spent + price, shares: state.shares + 1 };
+}
