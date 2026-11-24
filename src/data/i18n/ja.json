@@ -30,6 +30,9 @@
     "shares": "{n}株",
     "gameNote": "株価の動きはゲーム用に大きくしています"
   },
+  "ball": {
+    "stock": "株"
+  },
   "events": {
     "oku": "億り人！",
     "crash": "暴落！",
@@ -93,5 +96,8 @@
     "price": "1株 {yen}",
     "cannot": "現金が足りません",
     "done": "1株買った！（現金 −{yen}）"
+  },
+  "common": {
+    "close": "閉じる"
   }
 }

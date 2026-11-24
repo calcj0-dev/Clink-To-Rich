@@ -33,12 +33,12 @@ describe('T-05 株価', () => {
   it.each([1, 42])('参照実装 sim と同じ：種 %i の「次のお金」と株価', (seed) => {
     const want = fixture[String(seed) as '1' | '42'];
     const g = createGame(config, currency, seed);
-    const tiers = [g.nextTier];
+    const tiers = [g.heldTier];
     const prices: number[] = [];
     for (let i = 0; i < want.prices.length; i++) {
       g.update(config.box.dropCooldownMs + 50);
       expect(g.drop(i % 2 ? 60 : 300)).toBe(true);
-      tiers.push(g.nextTier);
+      tiers.push(g.heldTier);
       prices.push(g.market.price);
     }
     expect(tiers).toEqual(want.tiers);

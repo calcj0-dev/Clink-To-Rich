@@ -86,6 +86,9 @@ export function createGame(cfg: Config, cur: Currency, seed: number | string = 1
     maxOku: 0,
     reachedOku: false,
     over: false,
+    // 手に持っているお金（次に落とす）と、その次のお金（右上に出す）。
+    // 乱数を使う順は sim と同じ：最初に2つ → 落とすたびに「株価 → その次のお金」
+    heldTier: pickDropTier(),
     nextTier: pickDropTier(),
     dropX: W / 2,
     lastDropAt: -Infinity,
@@ -144,8 +147,14 @@ export function createGame(cfg: Config, cur: Currency, seed: number | string = 1
   }
 
   return {
+    config: cfg,
     world,
     market,
+    /** 手に持っているお金（次に落とす段） */
+    get heldTier() {
+      return S.heldTier;
+    },
+    /** その次のお金（右上に出す段） */
     get nextTier() {
       return S.nextTier;
     },
@@ -161,20 +170,21 @@ export function createGame(cfg: Config, cur: Currency, seed: number | string = 1
     },
     /** 落とす位置を動かす（指を左右に動かしたとき）。次のお金が箱からはみ出ない所までに収める */
     setDropX(x: number): void {
-      S.dropX = clampX(x, world.radiusOf(S.nextTier));
+      S.dropX = clampX(x, world.radiusOf(S.heldTier));
     },
     canDrop,
     /** 次のお金を今の位置から落とす。株価が1回動く */
     drop(x: number = S.dropX): boolean {
       if (!canDrop()) return false;
-      const tier = S.nextTier;
+      const tier = S.heldTier;
       const cx = clampX(x, world.radiusOf(tier));
       world.addMoney(tier, cx, cfg.box.dropY);
-      S.nextTier = pickDropTier();
-      S.dropX = clampX(cx, world.radiusOf(S.nextTier));
       S.drops++;
       S.lastDropAt = world.now();
       const crashed = market.step(S.drops);
+      S.heldTier = S.nextTier;
+      S.nextTier = pickDropTier();
+      S.dropX = clampX(cx, world.radiusOf(S.heldTier));
       emit({ type: 'drop', tier });
       if (crashed) emit({ type: 'crash' });
       checkOku();

@@ -10,6 +10,8 @@ export type Tier = {
   radius: number;
   /** 見た目：coin（硬貨）・bill（お札）・bundle（束）・case（ケース） */
   look: string;
+  /** 硬貨の真ん中に穴がある（5円玉・50円玉） */
+  hole?: boolean;
   label: LocalizedText;
   color: string;
   line: LocalizedText;

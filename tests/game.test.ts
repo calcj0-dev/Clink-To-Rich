@@ -76,7 +76,7 @@ describe('落とす', () => {
 
   it('お金は箱からはみ出さない位置に落ちる', () => {
     const g = createGame(config, currency, 1);
-    const tier = g.nextTier;
+    const tier = g.heldTier;
     g.drop(-500);
     const b = g.world.balls()[0]!;
     expect(b.body.position.x).toBe(currency.tiers[tier]!.radius + 1);
