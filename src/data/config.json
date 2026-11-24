@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "currency": "JPY",
+  "box": {
+    "width": 360,
+    "height": 560,
+    "dangerLineY": 70,
+    "dropY": 30,
+    "overGraceMs": 1500,
+    "overConfirmMs": 1500,
+    "dropCooldownMs": 500
+  },
+  "physics": {
+    "gravity": 1,
+    "restitution": 0.1,
+    "friction": 0.3,
+    "density": 0.001,
+    "fps": 60
+  },
+  "stock": {
+    "radius": 33,
+    "drift": 0.02,
+    "vol": 0.055,
+    "crashProb": 0.008,
+    "crashSize": 0.35,
+    "crashCooldownDrops": 18,
+    "floorPrice": 100,
+    "buy": {
+      "button": true,
+      "sharesPerPress": 1,
+      "payFrom": "cashBalance",
+      "ballsRemain": true,
+      "fallFrom": "dropperX",
+      "advancesTime": false
+    }
+  },
+  "titles": [
+    {
+      "id": "t_legend",
+      "rule": "totalAtLeast",
+      "amount": "legend"
+    },
+    {
+      "id": "t_oku",
+      "rule": "totalAtLeast",
+      "amount": "oku"
+    },
+    {
+      "id": "t_tansu",
+      "rule": "noStock"
+    },
+    {
+      "id": "t_crash",
+      "rule": "boughtBeforeCrash",
+      "withinDrops": 3
+    },
+    {
+      "id": "t_rich",
+      "rule": "totalAtLeast",
+      "amount": "rich"
+    },
+    {
+      "id": "t_hesokuri",
+      "rule": "totalAtLeast",
+      "amount": "hesokuri"
+    },
+    {
+      "id": "t_rookie",
+      "rule": "else"
+    }
+  ],
+  "sounds": {
+    "coin": "chalin",
+    "bill": "pera",
+    "bundle": "dosa",
+    "case": "gacha",
+    "buy": "pon",
+    "crash": "hyuDon",
+    "over": "parin",
+    "oku": "fanfare"
+  },
+  "hashtag": "億までチャリン",
+  "storageKey": "baka038.v1",
+  "links": {
+    "portal": "https://app-lab-rust.vercel.app/?utm_source=bakage&utm_medium=game&utm_campaign=baka038",
+    "tameru": "https://tameru-lovat.vercel.app/?utm_source=bakage&utm_medium=game&utm_campaign=baka038",
+    "tva": "https://trader-vs-autopilot.vercel.app/?utm_source=bakage&utm_medium=game&utm_campaign=baka038",
+    "follow": "https://x.com/shooojp19"
+  }
+}

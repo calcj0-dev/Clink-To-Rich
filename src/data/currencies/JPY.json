@@ -1,0 +1,219 @@
+{
+  "id": "JPY",
+  "version": 1,
+  "symbol": "円",
+  "locale": "ja-JP",
+  "tiers": [
+    {
+      "id": "y1",
+      "value": 1,
+      "radius": 13,
+      "look": "coin",
+      "label": {
+        "ja": "1円玉"
+      },
+      "color": "#C9CED6",
+      "line": {
+        "ja": "拾ってもらえない"
+      }
+    },
+    {
+      "id": "y5",
+      "value": 5,
+      "radius": 17,
+      "look": "coin",
+      "label": {
+        "ja": "5円玉"
+      },
+      "color": "#D9B44A",
+      "line": {
+        "ja": "ご縁があります"
+      }
+    },
+    {
+      "id": "y10",
+      "value": 10,
+      "radius": 21,
+      "look": "coin",
+      "label": {
+        "ja": "10円玉"
+      },
+      "color": "#B87333",
+      "line": {
+        "ja": "ギザギザに憧れている"
+      }
+    },
+    {
+      "id": "y50",
+      "value": 50,
+      "radius": 27,
+      "look": "coin",
+      "label": {
+        "ja": "50円玉"
+      },
+      "color": "#D5D9DE",
+      "line": {
+        "ja": "穴があいてるけど元気"
+      }
+    },
+    {
+      "id": "y100",
+      "value": 100,
+      "radius": 33,
+      "look": "coin",
+      "label": {
+        "ja": "100円玉"
+      },
+      "color": "#BFC5CC",
+      "line": {
+        "ja": "自販機の友"
+      }
+    },
+    {
+      "id": "y500",
+      "value": 500,
+      "radius": 38,
+      "look": "coin",
+      "label": {
+        "ja": "500円玉"
+      },
+      "color": "#D8C27A",
+      "line": {
+        "ja": "貯金箱のボス"
+      }
+    },
+    {
+      "id": "y1000",
+      "value": 1000,
+      "radius": 44,
+      "look": "bill",
+      "label": {
+        "ja": "千円札"
+      },
+      "color": "#8FB3D9",
+      "line": {
+        "ja": "ランチで消える"
+      }
+    },
+    {
+      "id": "y10000",
+      "value": 10000,
+      "radius": 52,
+      "look": "bill",
+      "label": {
+        "ja": "1万円札"
+      },
+      "color": "#C9B38A",
+      "line": {
+        "ja": "財布の中で一番えらい"
+      }
+    },
+    {
+      "id": "y100k",
+      "value": 100000,
+      "radius": 63,
+      "look": "bundle",
+      "label": {
+        "ja": "10万円"
+      },
+      "color": "#B9A37A",
+      "line": {
+        "ja": "給料袋の気分"
+      }
+    },
+    {
+      "id": "y1m",
+      "value": 1000000,
+      "radius": 76,
+      "look": "bundle",
+      "label": {
+        "ja": "100万円"
+      },
+      "color": "#A88F5F",
+      "line": {
+        "ja": "帯付き。初めて見た"
+      }
+    },
+    {
+      "id": "y10m",
+      "value": 10000000,
+      "radius": 90,
+      "look": "bundle",
+      "label": {
+        "ja": "1,000万円"
+      },
+      "color": "#8C7448",
+      "line": {
+        "ja": "カバンが閉まらない"
+      }
+    },
+    {
+      "id": "y100m",
+      "value": 100000000,
+      "radius": 104,
+      "look": "case",
+      "label": {
+        "ja": "1億円"
+      },
+      "color": "#9AA3AD",
+      "line": {
+        "ja": "中身を確認しますか？（怪しい）"
+      }
+    }
+  ],
+  "topTier": {
+    "id": "y100m",
+    "additive": true,
+    "growPerUnit": 0.1,
+    "maxRadius": 120,
+    "unitValue": 100000000
+  },
+  "drops": {
+    "y1": 30,
+    "y5": 25,
+    "y10": 20,
+    "y50": 15,
+    "y100": 10
+  },
+  "goal": {
+    "value": 100000000
+  },
+  "titleAmounts": {
+    "legend": 1000000000,
+    "oku": 100000000,
+    "rich": 10000000,
+    "hesokuri": 1000000
+  },
+  "stock": {
+    "startPrice": 10000,
+    "minUnit": 100,
+    "sigDigits": 2,
+    "colorSteps": [
+      {
+        "fromRatio": 0,
+        "color": "#4A7BD0",
+        "name": "blue"
+      },
+      {
+        "fromRatio": 1,
+        "color": "#3FA45B",
+        "name": "green"
+      },
+      {
+        "fromRatio": 10,
+        "color": "#9BC53D",
+        "name": "lime"
+      },
+      {
+        "fromRatio": 100,
+        "color": "#E0B12E",
+        "name": "gold"
+      },
+      {
+        "fromRatio": 1000,
+        "color": "rainbow",
+        "name": "rainbow"
+      }
+    ]
+  }
+}
