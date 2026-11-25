@@ -3,9 +3,8 @@
 
 import { currency } from '../data';
 import type { Game } from '../core/game';
-import { stockColor } from '../core/rules';
+import { turnipColor } from '../core/rules';
 import type { Tier } from '../core/types';
-import { t } from '../i18n';
 import { money } from '../money';
 
 const TOP = currency.tiers.length - 1;
@@ -128,21 +127,49 @@ export function drawMoney(ctx: CanvasRenderingContext2D, tier: number, r: number
   if (words) label(ctx, words, 0, h * 0.22, r * 0.3, w * 0.85, '#ffffff');
 }
 
-/** 株の玉を描く。色は今の株価で決まる（全部の株の玉が同じ色） */
-export function drawStock(ctx: CanvasRenderingContext2D, r: number, price: number): void {
-  const step = stockColor(price, currency.stock.startPrice, currency.stock.colorSteps);
+/** かぶ（株）の玉を描く（2026-11-25 オーナー決定）。物理の形は円のまま。
+ *  色は平均取得価額と今の株価で決まる（全部のかぶが同じ色）：同じなら白、上がると金、下がると黒 */
+export function drawTurnip(ctx: CanvasRenderingContext2D, r: number, color: string): void {
+  const leaf = '#4f9a3c';
+  const leafDark = '#3a7a2b';
+  // 葉（3枚）と茎
+  const leaves: [number, number][] = [
+    [-0.42, -0.95],
+    [0, -1.0],
+    [0.42, -0.95],
+  ];
+  for (const [lx, ly] of leaves) {
+    ctx.beginPath();
+    ctx.moveTo(0, -r * 0.5);
+    ctx.quadraticCurveTo(lx * r * 1.25, -r * 0.62, lx * r, ly * r * 0.92);
+    ctx.quadraticCurveTo(lx * r * 0.35, -r * 0.72, 0, -r * 0.5);
+    ctx.fillStyle = leaf;
+    ctx.fill();
+    ctx.lineWidth = Math.max(0.8, r * 0.04);
+    ctx.strokeStyle = leafDark;
+    ctx.stroke();
+  }
+  // 実（少し下に寄せた丸）と、下に細い根
+  const cy = r * 0.14;
+  const br = r * 0.8;
   ctx.beginPath();
-  ctx.arc(0, 0, r, 0, Math.PI * 2);
-  if (step.color === 'rainbow') {
-    const g = ctx.createLinearGradient(-r, -r, r, r);
-    ['#e84a5f', '#f5a623', '#f8e71c', '#3fa45b', '#4a7bd0', '#9b59b6'].forEach((col, i, a) => g.addColorStop(i / (a.length - 1), col));
-    ctx.fillStyle = g;
-  } else ctx.fillStyle = step.color;
-  ctx.fill();
-  ctx.lineWidth = Math.max(1, r * 0.07);
-  ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+  ctx.moveTo(-r * 0.05, cy + br * 0.95);
+  ctx.quadraticCurveTo(0, r * 1.02, r * 0.02, r * 0.99);
+  ctx.lineWidth = Math.max(1, r * 0.06);
+  ctx.strokeStyle = shade(color, -0.3);
   ctx.stroke();
-  label(ctx, t('ball.stock'), 0, 0, r * 0.8, r * 1.3, '#ffffff');
+  ctx.beginPath();
+  ctx.arc(0, cy, br, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.lineWidth = Math.max(1, r * 0.06);
+  ctx.strokeStyle = shade(color, -0.3);
+  ctx.stroke();
+  // つや
+  ctx.beginPath();
+  ctx.ellipse(-br * 0.38, cy - br * 0.3, br * 0.18, br * 0.3, -0.5, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255,255,255,0.45)';
+  ctx.fill();
 }
 
 export type DrawState = { now: number; showHeld: boolean };
@@ -179,13 +206,13 @@ export function drawBox(ctx: CanvasRenderingContext2D, game: Game, s: DrawState)
   ctx.stroke();
   ctx.restore();
 
-  const price = game.price();
+  const kabu = turnipColor(game.price(), game.avgCost(), game.config.stock.color);
   for (const b of game.world.balls()) {
     ctx.save();
     ctx.translate(b.body.position.x, b.body.position.y);
     ctx.rotate(b.body.angle);
     if (b.kind === 'money') drawMoney(ctx, b.tier, b.body.circleRadius ?? 10, b.oku || 1);
-    else drawStock(ctx, b.body.circleRadius ?? 10, price);
+    else drawTurnip(ctx, b.body.circleRadius ?? 10, kabu);
     ctx.restore();
   }
 

@@ -47,5 +47,15 @@ export function hud() {
     }
   }
 
-  return { el, update };
+  /** 暴落のとき、株の金額を一瞬赤くする */
+  let flashTimer = 0;
+  function flashStock() {
+    stock.classList.remove('flash');
+    void stock.offsetWidth; // もう一度アニメーションさせるため
+    stock.classList.add('flash');
+    clearTimeout(flashTimer);
+    flashTimer = window.setTimeout(() => stock.classList.remove('flash'), 1200);
+  }
+
+  return { el, update, flashStock, dispose: () => clearTimeout(flashTimer) };
 }

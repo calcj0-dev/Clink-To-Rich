@@ -17,7 +17,8 @@ export type Tier = {
   line: LocalizedText;
 };
 
-export type StockColorStep = { fromRatio: number; color: string; name: string };
+/** かぶの色（config.json の stock.color）：平均取得価額と同じなら base、upFullRatio 倍で up、downFullRatio 倍で down */
+export type TurnipColor = { base: string; up: string; upFullRatio: number; down: string; downFullRatio: number };
 
 /** 通貨ごとのデータ（決定 #13）。通貨を足すときはこの形の JSON を足す */
 export type Currency = {
@@ -30,7 +31,7 @@ export type Currency = {
   drops: Record<string, number>;
   goal: { value: number };
   titleAmounts: Record<string, number>;
-  stock: { startPrice: number; minUnit: number; sigDigits: number; colorSteps: StockColorStep[] };
+  stock: { startPrice: number; minUnit: number; sigDigits: number };
 };
 
 export type TitleRule = {
@@ -63,6 +64,7 @@ export type Config = {
     crashSize: number;
     crashCooldownDrops: number;
     floorPrice: number;
+    color: TurnipColor;
     buy: {
       button: boolean;
       sharesPerPress: number;
@@ -70,6 +72,8 @@ export type Config = {
       ballsRemain: boolean;
       fallFrom: string;
       advancesTime: boolean;
+      /** 続けて買ったとき、かぶを1つずつ降らせる間（ミリ秒） */
+      spawnIntervalMs: number;
     };
   };
   titles: TitleRule[];

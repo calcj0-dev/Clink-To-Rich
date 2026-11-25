@@ -49,7 +49,9 @@ describe('T-01 データの検査', () => {
     expect(check(cfgWith((c) => (c.links.portal = 'https://example.com')), currency)).not.toEqual([]);
   });
 
-  it('株の色の段が順に並んでいないと止まる', () => {
-    expect(check(config, curWith((c) => c.stock.colorSteps.reverse()))).not.toEqual([]);
+  it('かぶの色の設定がおかしいと止まる（金になる倍率が1以下・黒になる倍率が1以上・色の形が違う）', () => {
+    expect(check(cfgWith((c) => (c.stock.color.upFullRatio = 1)), currency)).not.toEqual([]);
+    expect(check(cfgWith((c) => (c.stock.color.downFullRatio = 1.5)), currency)).not.toEqual([]);
+    expect(check(cfgWith((c) => (c.stock.color.up = 'gold')), currency)).not.toEqual([]);
   });
 });

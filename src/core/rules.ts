@@ -1,6 +1,6 @@
 // 表示と判定（設計書 3章）。参照実装 sim/rules.mjs と同じ結果にする（T-02）
 
-import type { StockColorStep, TitleRule } from './types';
+import type { TitleRule, TurnipColor } from './types';
 
 /** 金額の表示に使う言葉（ja.json の num と、通貨の symbol・locale） */
 export type MoneyUnits = { oku: string; man: string; symbol: string; locale: string };
@@ -30,12 +30,31 @@ export function okuRadius(oku: number, baseRadius: number, top: { growPerUnit: n
   return Math.min(baseRadius * (1 + top.growPerUnit * (oku - 1)), top.maxRadius);
 }
 
-/** 株の色：今の株価 ÷ 始まりの株価 が fromRatio 以上の一番上の段 */
-export function stockColor(price: number, startPrice: number, steps: StockColorStep[]): StockColorStep {
-  const r = price / startPrice;
-  let hit = steps[0]!;
-  for (const s of steps) if (r >= s.fromRatio) hit = s;
-  return hit;
+/** 2つの色（#RRGGBB）を t（0〜1）で混ぜる */
+export function mixColor(a: string, b: string, t: number): string {
+  const pa = parseInt(a.slice(1), 16);
+  const pb = parseInt(b.slice(1), 16);
+  const ch = (shift: number) => {
+    const x = (pa >> shift) & 255;
+    const y = (pb >> shift) & 255;
+    return Math.round(x + (y - x) * t);
+  };
+  return `#${[16, 8, 0].map((s) => ch(s).toString(16).padStart(2, '0')).join('').toUpperCase()}`;
+}
+
+/** かぶの色の寄り具合：今の株価 ÷ 平均取得価額 で決める（2026-11-25 オーナー決定）。
+ *  +1 で up になりきり、−1 で down になりきる。株がないときは 0（base）。倍率は対数で見る（2倍と半分が同じ幅） */
+export function turnipLean(price: number, avgCost: number, c: TurnipColor): number {
+  if (!(avgCost > 0)) return 0;
+  const r = price / avgCost;
+  if (r >= 1) return Math.min(1, Math.log(r) / Math.log(c.upFullRatio));
+  return -Math.min(1, Math.log(r) / Math.log(c.downFullRatio));
+}
+
+/** かぶの色：同じなら白、10倍で金、半分で黒（config.json の stock.color） */
+export function turnipColor(price: number, avgCost: number, c: TurnipColor): string {
+  const lean = turnipLean(price, avgCost, c);
+  return lean >= 0 ? mixColor(c.base, c.up, lean) : mixColor(c.base, c.down, -lean);
 }
 
 export type TitleInput = { total: number; sharesBought: number; boughtDrops: number[]; crashDrops: number[] };

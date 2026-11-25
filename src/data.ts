@@ -53,9 +53,11 @@ export function validateData(cfg: Config, cur: Currency, msgs: MessagesForCheck,
   const biggestDrop = T[DROP_COUNT - 1];
   check(biggestDrop && cfg.stock.radius === biggestDrop.radius, 'stock.radius: must equal the largest dropped coin');
   check(cur.stock.startPrice > 0 && cur.stock.minUnit > 0 && cur.stock.sigDigits >= 1, 'stock: startPrice/minUnit/sigDigits');
-  const steps = cur.stock.colorSteps;
-  check(steps.length > 0 && steps[0]!.fromRatio === 0, 'stock.colorSteps: first step must start at 0');
-  check(steps.every((s, i) => i === 0 || s.fromRatio > steps[i - 1]!.fromRatio), 'stock.colorSteps: must be in order');
+  const col = cfg.stock.color;
+  const hex = /^#[0-9A-Fa-f]{6}$/;
+  check(hex.test(col.base) && hex.test(col.up) && hex.test(col.down), 'stock.color: colors must be #RRGGBB');
+  check(col.upFullRatio > 1 && col.downFullRatio > 0 && col.downFullRatio < 1, 'stock.color: upFullRatio > 1 and 0 < downFullRatio < 1');
+  check(cfg.stock.buy.spawnIntervalMs >= 0, 'stock.buy.spawnIntervalMs');
   check(
     cfg.stock.buy.payFrom === 'cashBalance' && cfg.stock.buy.ballsRemain === true && cfg.stock.buy.sharesPerPress === 1,
     'stock.buy: pay from cash balance, 1 share per press, balls remain',

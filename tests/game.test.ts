@@ -33,6 +33,8 @@ describe('T-04 株を買う', () => {
     expect(g.cash()).toBe(1000);
     expect(g.play().shares).toBe(1);
     expect(g.play().spent).toBe(10000);
+    expect(stockCount(g)).toBe(0); // かぶは時間が進んでから降る（チャートを閉じたら）
+    g.update(20);
     expect(stockCount(g)).toBe(1);
     expect(moneyCount(g)).toBe(moneyBefore);
     expect(events).toContainEqual({ type: 'buy', price: 10000, shares: 1, cash: 1000 });
@@ -44,10 +46,36 @@ describe('T-04 株を買う', () => {
     g.world.addMoney(tierIndex('y10000'), 60, H - 52);
     g.setDropX(250);
     g.buy();
+    g.update(1); // 1/60 秒に満たないので、まだ物理は進まない
+    expect(stockCount(g)).toBe(0);
+    g.update(20);
     const stock = g.world.balls().find((b) => b.kind === 'stock')!;
     expect(stock.body.position.x).toBe(250);
-    expect(stock.body.position.y).toBe(config.box.dropY);
+    expect(stock.body.position.y).toBeLessThan(config.box.dropY + 2);
     expect(stock.body.circleRadius).toBe(config.stock.radius);
+  });
+
+  it('続けて買うと、かぶは間をあけて1つずつ降る。時間を進めなければ（チャートを開いている間）降らない', () => {
+    const g = createGame(config, currency, 1);
+    g.world.addMoney(tierIndex('y100k'), 180, H - 63);
+    for (let i = 0; i < 3; i++) expect(g.buy()).toBe(true);
+    expect(g.play().shares).toBe(3);
+    expect(stockCount(g)).toBe(0);
+    g.update(20);
+    expect(stockCount(g)).toBe(1);
+    g.update(config.stock.buy.spawnIntervalMs + 20);
+    expect(stockCount(g)).toBe(2);
+    g.update(config.stock.buy.spawnIntervalMs + 20);
+    expect(stockCount(g)).toBe(3);
+  });
+
+  it('平均取得価額＝株に使った額 ÷ 株数', () => {
+    const g = createGame(config, currency, 1);
+    expect(g.avgCost()).toBe(0);
+    g.world.addMoney(tierIndex('y100k'), 180, H - 63);
+    g.buy();
+    g.buy();
+    expect(g.avgCost()).toBe(10000);
   });
 
   it('合体でお金が増えると現金も増える（1円＋1円 → 5円で +3円）', () => {

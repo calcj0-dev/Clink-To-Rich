@@ -1,7 +1,7 @@
 // T-02 丸め・表示・色・称号（sim/validate_result.md の「2.」の例がすべて同じになる）
 import { describe, expect, it } from 'vitest';
 import { config, currency, messagesByLocale } from '../src/data';
-import { buyOne, cashOf, okuRadius, roundPrice, stockColor, titleFor } from '../src/core/rules';
+import { buyOne, cashOf, okuRadius, roundPrice, titleFor, turnipColor, turnipLean } from '../src/core/rules';
 import { money } from '../src/money';
 
 const R0 = currency.tiers[currency.tiers.length - 1]!.radius;
@@ -38,14 +38,24 @@ describe('T-02 丸め・表示・色・称号', () => {
     expect(money(y)).toBe(want);
   });
 
+  // かぶの色（2026-11-25 オーナー決定）：平均取得価額と比べて、同じなら白、10倍で金、半分で黒
+  const C = config.stock.color;
   it.each([
-    [9000, 'blue'],
-    [10000, 'green'],
-    [120000, 'lime'],
-    [1500000, 'gold'],
-    [46000000, 'rainbow'],
-  ])('株の色 1株%i円 → %s', (price, want) => {
-    expect(stockColor(price, currency.stock.startPrice, currency.stock.colorSteps).name).toBe(want);
+    ['株を持っていない', 20000, 0, '#FFFFFF'],
+    ['平均取得価額と同じ', 10000, 10000, '#FFFFFF'],
+    ['10倍', 100000, 10000, '#E0B12E'],
+    ['100倍（金のまま）', 1000000, 10000, '#E0B12E'],
+    ['半分', 5000, 10000, '#1A1A1A'],
+    ['4分の1（黒のまま）', 2500, 10000, '#1A1A1A'],
+  ])('かぶの色：%s → %s', (_name, price, avg, want) => {
+    expect(turnipColor(price as number, avg as number, C)).toBe(want);
+  });
+
+  it('かぶの色：上がるほど金に、下がるほど黒に近づく（倍率は対数で見る）', () => {
+    expect(turnipLean(10000 * Math.sqrt(10), 10000, C)).toBeCloseTo(0.5, 10); // 約3.16倍で半分金
+    expect(turnipLean(10000 * Math.SQRT1_2, 10000, C)).toBeCloseTo(-0.5, 10); // 約0.71倍で半分黒
+    expect(turnipLean(20000, 10000, C)).toBeGreaterThan(0);
+    expect(turnipLean(6500, 10000, C)).toBeLessThan(-0.6); // 暴落1回分でかなり黒い
   });
 
   it('現金12,610円で1株1万円を買う → 現金2,610円・1株。次の1株は買えない。合体で現金も増える', () => {

@@ -94,6 +94,9 @@ export function createGame(cfg: Config, cur: Currency, seed: number | string = 1
     lastDropAt: -Infinity,
     overMs: 0,
     acc: 0,
+    /** 買ったがまだ降らせていないかぶの数（続けて買ったときは1つずつ降らせる） */
+    stockQueue: 0,
+    lastStockAt: -Infinity,
   };
 
   const listeners = new Set<(e: GameEvent) => void>();
@@ -107,6 +110,8 @@ export function createGame(cfg: Config, cur: Currency, seed: number | string = 1
   const cash = () => cashOf(ballsValue(), S.spent);
   const stockValue = () => S.shares * price();
   const total = () => cash() + stockValue();
+  /** 平均取得価額＝株に使った額 ÷ 持っている株数（株がなければ 0） */
+  const avgCost = () => (S.shares > 0 ? S.spent / S.shares : 0);
 
   const clampX = (x: number, r: number) => Math.min(Math.max(x, r + 1), W - r - 1);
 
@@ -132,6 +137,11 @@ export function createGame(cfg: Config, cur: Currency, seed: number | string = 1
   const canDrop = () => !S.over && world.now() - S.lastDropAt >= cfg.box.dropCooldownMs;
 
   function physicsStep(): void {
+    if (S.stockQueue > 0 && world.now() - S.lastStockAt >= cfg.stock.buy.spawnIntervalMs) {
+      S.stockQueue--;
+      S.lastStockAt = world.now();
+      world.addStock(clampX(S.dropX, cfg.stock.radius), cfg.box.dropY);
+    }
     for (const m of world.step(stepMs)) {
       if (m.ball.tier === TOP) S.maxOku = Math.max(S.maxOku, m.ball.oku);
       emit({ type: 'merge', from: m.from, to: m.ball.tier, oku: m.ball.oku });
@@ -193,7 +203,8 @@ export function createGame(cfg: Config, cur: Currency, seed: number | string = 1
     canBuy(): boolean {
       return !S.over && cash() >= price();
     },
-    /** 「株を買う」：現金から1株の値段を引き、株の玉を落とす位置から落とす。お金の玉は消えない。株価は動かない */
+    /** 「買」：現金から1株の値段を引く。かぶの玉は次に時間が進んだとき、落とす位置から1つずつ降る。
+     *  お金の玉は消えない。株価は動かない */
     buy(): boolean {
       if (S.over) return false;
       const p = price();
@@ -202,10 +213,12 @@ export function createGame(cfg: Config, cur: Currency, seed: number | string = 1
       S.spent = next.spent;
       S.shares = next.shares;
       S.boughtDrops.push(S.drops);
-      world.addStock(clampX(S.dropX, cfg.stock.radius), cfg.box.dropY);
+      S.stockQueue++;
       emit({ type: 'buy', price: p, shares: S.shares, cash: cash() });
       return true;
     },
+    /** 平均取得価額（かぶの色の基準） */
+    avgCost,
     /** 時間を ms ミリ秒進める（物理は 1/fps 秒ずつ）。終わったら進めない */
     update(ms: number): void {
       S.acc += ms;

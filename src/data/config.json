@@ -25,13 +25,21 @@
     "crashSize": 0.35,
     "crashCooldownDrops": 18,
     "floorPrice": 100,
+    "color": {
+      "base": "#FFFFFF",
+      "up": "#E0B12E",
+      "upFullRatio": 10,
+      "down": "#1A1A1A",
+      "downFullRatio": 0.5
+    },
     "buy": {
       "button": true,
       "sharesPerPress": 1,
       "payFrom": "cashBalance",
       "ballsRemain": true,
       "fallFrom": "dropperX",
-      "advancesTime": false
+      "advancesTime": false,
+      "spawnIntervalMs": 250
     }
   },
   "titles": [

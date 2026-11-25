@@ -378,3 +378,92 @@ button {
   color: var(--text-sub);
   margin-bottom: 8px;
 }
+
+/* ---- かぶ（株価）の画面 ---- */
+.kabu-panel {
+  width: min(360px, 92vw);
+  text-align: center;
+}
+
+.kabu-chart {
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 320 / 150;
+  display: block;
+  margin: 0 auto 8px;
+  background: #fbf6ea;
+  border-radius: 8px;
+}
+
+.kabu-price {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.kabu-held {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-weight: 700;
+}
+
+.kabu-icon {
+  width: 28px;
+  height: 28px;
+}
+
+.kabu-sub {
+  font-size: 13px;
+  color: var(--text-sub);
+}
+
+.kabu-status {
+  min-height: 1.6em;
+  margin: 6px 0;
+  font-weight: 700;
+  color: #3a7a2b;
+}
+
+.kabu-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.btn-kabu-buy {
+  background: #3fa45b;
+  border-color: #3fa45b;
+  color: #fff;
+  min-width: 120px;
+  font-size: 18px;
+}
+
+/* ---- 暴落の演出 ---- */
+.toast-crash {
+  background: #e23b3b;
+  font-size: 30px;
+}
+
+.stage.shake {
+  animation: shake 0.45s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translate(0, 0); }
+  15% { transform: translate(-6px, 2px); }
+  30% { transform: translate(6px, -2px); }
+  45% { transform: translate(-4px, 1px); }
+  60% { transform: translate(4px, -1px); }
+  80% { transform: translate(-2px, 0); }
+}
+
+.hud-stock.flash {
+  animation: flash-red 1.2s ease-out;
+}
+
+@keyframes flash-red {
+  0%, 40% { color: #e23b3b; font-weight: 800; }
+  100% { color: inherit; }
+}

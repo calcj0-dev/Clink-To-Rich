@@ -189,33 +189,6 @@
   "stock": {
     "startPrice": 10000,
     "minUnit": 100,
-    "sigDigits": 2,
-    "colorSteps": [
-      {
-        "fromRatio": 0,
-        "color": "#4A7BD0",
-        "name": "blue"
-      },
-      {
-        "fromRatio": 1,
-        "color": "#3FA45B",
-        "name": "green"
-      },
-      {
-        "fromRatio": 10,
-        "color": "#9BC53D",
-        "name": "lime"
-      },
-      {
-        "fromRatio": 100,
-        "color": "#E0B12E",
-        "name": "gold"
-      },
-      {
-        "fromRatio": 1000,
-        "color": "rainbow",
-        "name": "rainbow"
-      }
-    ]
+    "sigDigits": 2
   }
 }
