@@ -1,15 +1,18 @@
-// 物理（設計書 3章）。Matter.js の円の剛体、壁は左右と床。参照実装 sim/game.mjs と同じ作り
+// 物理（設計書 3章）。Matter.js の剛体、壁は左右と床。参照実装 sim/game.mjs と同じ作り
+// 形：硬貨とかぶは円、お札・束・ケースは角の丸い四角（2026-11-25 オーナー決定。sim は円のまま）
 // 合体：衝突の始まりで同じ段のお金どうしなら2つを消し、中点に1つ上の段を作る。1億円以上どうしは足し算
 
 import Matter from 'matter-js';
 import { okuRadius } from './rules';
+import { moneyShape, type Shape } from './shapes';
 import type { Config, Currency } from './types';
 
 const { Engine, Bodies, Composite, Events } = Matter;
 
+/** 玉（お金・かぶ）。r は大きさの基準（丸の半径。四角はこの丸と同じ面積） */
 export type Ball =
-  | { kind: 'money'; body: Matter.Body; tier: number; oku: number; born: number; dead: boolean }
-  | { kind: 'stock'; body: Matter.Body; born: number; dead: boolean };
+  | { kind: 'money'; body: Matter.Body; tier: number; oku: number; r: number; born: number; dead: boolean }
+  | { kind: 'stock'; body: Matter.Body; r: number; born: number; dead: boolean };
 
 export type MoneyBall = Extract<Ball, { kind: 'money' }>;
 
@@ -28,8 +31,10 @@ export type World = {
   step(dt: number): MergeEvent[];
   /** お金の玉の金額 */
   valueOf(ball: MoneyBall): number;
-  /** 段 tier（一番上の段では億の数 oku）の玉の半径 */
+  /** 段 tier（一番上の段では億の数 oku）の玉の半径（大きさの基準） */
   radiusOf(tier: number, oku?: number): number;
+  /** 段 tier の形（硬貨は丸、お札・束・ケースは四角） */
+  shapeOf(tier: number, oku?: number): Shape;
 };
 
 export function createWorld(cfg: Config, cur: Currency): World {
@@ -68,10 +73,16 @@ export function createWorld(cfg: Config, cur: Currency): World {
 
   const radiusOf = (tier: number, oku = 1) =>
     tier === TOP ? okuRadius(oku, tiers[TOP]!.radius, cur.topTier) : tiers[tier]!.radius;
+  const shapeOf = (tier: number, oku = 1): Shape => moneyShape(tiers[tier]!.look, radiusOf(tier, oku), cfg.physics.shapes);
 
   function addMoney(tier: number, x: number, y: number, oku = 1): MoneyBall {
-    const body = Bodies.circle(x, y, radiusOf(tier, oku), bodyOptions);
-    const ball: MoneyBall = { kind: 'money', body, tier, oku: tier === TOP ? oku : 0, born: engine.timing.timestamp, dead: false };
+    const r = radiusOf(tier, oku);
+    const shape = shapeOf(tier, oku);
+    const body =
+      shape.kind === 'circle'
+        ? Bodies.circle(x, y, shape.r, bodyOptions)
+        : Bodies.rectangle(x, y, shape.w, shape.h, { ...bodyOptions, chamfer: { radius: shape.corner } });
+    const ball: MoneyBall = { kind: 'money', body, tier, oku: tier === TOP ? oku : 0, r, born: engine.timing.timestamp, dead: false };
     byBody.set(body.id, ball);
     Composite.add(engine.world, body);
     return ball;
@@ -79,7 +90,7 @@ export function createWorld(cfg: Config, cur: Currency): World {
 
   function addStock(x: number, y: number): Ball {
     const body = Bodies.circle(x, y, cfg.stock.radius, bodyOptions);
-    const ball: Ball = { kind: 'stock', body, born: engine.timing.timestamp, dead: false };
+    const ball: Ball = { kind: 'stock', body, r: cfg.stock.radius, born: engine.timing.timestamp, dead: false };
     byBody.set(body.id, ball);
     Composite.add(engine.world, body);
     return ball;
@@ -116,5 +127,6 @@ export function createWorld(cfg: Config, cur: Currency): World {
     },
     valueOf: (ball) => (ball.tier === TOP ? ball.oku * tiers[TOP]!.value : tiers[ball.tier]!.value),
     radiusOf,
+    shapeOf,
   };
 }

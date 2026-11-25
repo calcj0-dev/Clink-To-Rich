@@ -5,6 +5,7 @@ import seedrandom from 'seedrandom';
 import { createMarket, type Market } from './market';
 import { createWorld, type Ball, type World } from './physics';
 import { buyOne, cashOf, roundPrice, titleFor } from './rules';
+import { halfWidth } from './shapes';
 import type { Config, Currency } from './types';
 
 /** 設計書 5.3 の Play。玉は Matter.js の世界の中 */
@@ -180,21 +181,21 @@ export function createGame(cfg: Config, cur: Currency, seed: number | string = 1
     },
     /** 落とす位置を動かす（指を左右に動かしたとき）。次のお金が箱からはみ出ない所までに収める */
     setDropX(x: number): void {
-      S.dropX = clampX(x, world.radiusOf(S.heldTier));
+      S.dropX = clampX(x, halfWidth(world.shapeOf(S.heldTier)));
     },
     canDrop,
     /** 次のお金を今の位置から落とす。株価が1回動く */
     drop(x: number = S.dropX): boolean {
       if (!canDrop()) return false;
       const tier = S.heldTier;
-      const cx = clampX(x, world.radiusOf(tier));
+      const cx = clampX(x, halfWidth(world.shapeOf(tier)));
       world.addMoney(tier, cx, cfg.box.dropY);
       S.drops++;
       S.lastDropAt = world.now();
       const crashed = market.step(S.drops);
       S.heldTier = S.nextTier;
       S.nextTier = pickDropTier();
-      S.dropX = clampX(cx, world.radiusOf(S.heldTier));
+      S.dropX = clampX(cx, halfWidth(world.shapeOf(S.heldTier)));
       emit({ type: 'drop', tier });
       if (crashed) emit({ type: 'crash' });
       checkOku();

@@ -51,7 +51,10 @@ describe('T-03 合体', () => {
     const m = money(w);
     expect(m).toHaveLength(1);
     expect(w.valueOf(m[0]!)).toBe(100_000_000);
-    expect(m[0]!.body.circleRadius).toBe(104);
+    expect(m[0]!.r).toBe(104);
+    expect(m[0]!.body.circleRadius ?? 0).toBe(0); // ケースは四角（丸ではない）
+    const box = m[0]!.body.bounds;
+    expect(Math.min(box.max.x - box.min.x, box.max.y - box.min.y)).toBeGreaterThan(100); // 面積が同じ四角（横 約206 × 縦 約165）
   });
 
   it('1億円＋1億円＝2億円（半径 114.4）、2億円＋1億円＝3億円（半径 120 上限）', () => {
@@ -63,7 +66,7 @@ describe('T-03 合体', () => {
     expect(m).toHaveLength(1);
     expect(m[0]!.oku).toBe(2);
     expect(w.valueOf(m[0]!)).toBe(200_000_000);
-    expect(m[0]!.body.circleRadius).toBeCloseTo(114.4, 6);
+    expect(m[0]!.r).toBeCloseTo(114.4, 6);
 
     w.addMoney(TOP, 180, m[0]!.body.position.y - 114.4 - 100, 1);
     run(w, 1200);
@@ -71,6 +74,6 @@ describe('T-03 合体', () => {
     expect(m).toHaveLength(1);
     expect(m[0]!.oku).toBe(3);
     expect(w.valueOf(m[0]!)).toBe(300_000_000);
-    expect(m[0]!.body.circleRadius).toBe(120);
+    expect(m[0]!.r).toBe(120);
   });
 });

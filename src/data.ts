@@ -4,6 +4,7 @@
 import configJson from './data/config.json';
 import jpyJson from './data/currencies/JPY.json';
 import jaJson from './data/i18n/ja.json';
+import { halfWidth, moneyShape } from './core/shapes';
 import type { Config, Currency } from './core/types';
 import type { Locale } from './i18n/types';
 
@@ -73,6 +74,16 @@ export function validateData(cfg: Config, cur: Currency, msgs: MessagesForCheck,
   check(cfg.titles.every((t) => t.rule !== 'totalAtLeast' || (t.amount && t.amount in a)), 'titles: amount not in titleAmounts');
   check(cfg.titles.every((t) => msgs.titles[t.id] && msgs.titleLines[t.id]), 'titles: each title needs a name and a line');
   check(cfg.titles[cfg.titles.length - 1]?.rule === 'else', 'titles: last rule must be "else"');
+
+  const shapes = cfg.physics.shapes;
+  check(
+    Object.entries(shapes).every(([look, s]) => LOOKS.includes(look) && look !== 'coin' && s.aspect >= 1 && s.corner >= 0 && s.corner <= 0.5),
+    'physics.shapes: look must be bill/bundle/case, aspect >= 1, 0 <= corner <= 0.5',
+  );
+  if (last) {
+    const biggest = moneyShape(last.look, cur.topTier.maxRadius, shapes);
+    check(halfWidth(biggest) * 2 <= cfg.box.width * (2 / 3) + 0.5, 'physics.shapes: the biggest top tier must fit in 2/3 of the box width');
+  }
 
   check(cfg.links.portal.startsWith(PORTAL), 'links.portal: must point to Ted App Lab');
   check(cfg.box.dangerLineY > 0 && cfg.box.dangerLineY < cfg.box.height, 'box.dangerLineY');

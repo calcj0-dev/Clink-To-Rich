@@ -15,7 +15,21 @@
     "restitution": 0.1,
     "friction": 0.3,
     "density": 0.001,
-    "fps": 60
+    "fps": 60,
+    "shapes": {
+      "bill": {
+        "aspect": 1.8,
+        "corner": 0.12
+      },
+      "bundle": {
+        "aspect": 1.4,
+        "corner": 0.12
+      },
+      "case": {
+        "aspect": 1.25,
+        "corner": 0.14
+      }
+    }
   },
   "stock": {
     "radius": 33,

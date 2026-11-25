@@ -55,7 +55,15 @@ export type Config = {
     overConfirmMs: number;
     dropCooldownMs: number;
   };
-  physics: { gravity: number; restitution: number; friction: number; density: number; fps: number };
+  physics: {
+    gravity: number;
+    restitution: number;
+    friction: number;
+    density: number;
+    fps: number;
+    /** お札・束・ケースの四角の形（縦横の比・角の丸み）。ここにない見た目は丸 */
+    shapes: Record<string, { aspect: number; corner: number }>;
+  };
   stock: {
     radius: number;
     drift: number;
