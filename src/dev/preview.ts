@@ -72,6 +72,6 @@ export function previewOg(): void {
   const kr = Math.max(12, config.stock.radius * k * 1.2);
   ctx.save();
   ctx.translate(x + kr, base - kr);
-  drawTurnip(ctx, kr, config.stock.color.up);
+  drawTurnip(ctx, kr, config.stock.color.base);
   ctx.restore();
 }

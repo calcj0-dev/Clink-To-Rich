@@ -13,7 +13,7 @@ const TOP = currency.tiers.length - 1;
 const FONT = 'system-ui, "Hiragino Sans", "Noto Sans JP", sans-serif';
 
 /** 色を白（amt>0）または黒（amt<0）に寄せる */
-function shade(hex: string, amt: number): string {
+export function shade(hex: string, amt: number): string {
   const n = parseInt(hex.slice(1), 16);
   const mix = (c: number) => Math.round(amt >= 0 ? c + (255 - c) * amt : c * (1 + amt));
   const r = mix((n >> 16) & 255);
@@ -23,7 +23,7 @@ function shade(hex: string, amt: number): string {
 }
 
 /** 文字を幅 maxW に収めて真ん中に書く。emboss なら左上に明るい影を付けて刻印のように */
-function label(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, size: number, maxW: number, color: string, emboss = '') {
+export function label(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, size: number, maxW: number, color: string, emboss = '') {
   ctx.font = `800 ${size}px ${FONT}`;
   const w = ctx.measureText(text).width;
   if (w > maxW) {
@@ -41,7 +41,7 @@ function label(ctx: CanvasRenderingContext2D, text: string, x: number, y: number
   ctx.fillText(text, x, yy);
 }
 
-function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+export function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   ctx.beginPath();
   ctx.roundRect(x, y, w, h, Math.max(0, r));
 }
@@ -111,49 +111,83 @@ function drawCoin(ctx: CanvasRenderingContext2D, tr: Tier, r: number, words: str
   ctx.fill();
 }
 
-/** お札：紙の面（少し反った光）、内側の枠、金額 */
-function drawBill(ctx: CanvasRenderingContext2D, tr: Tier, w: number, h: number, corner: number, words: string) {
-  const c = tr.color;
-  roundRect(ctx, -w / 2, -h / 2, w, h, corner);
+/** 四隅の小さな数字を描く大きさの下限（これより小さいお札では、つぶれるので描かない） */
+const BILL_DETAIL_MIN_H = 70;
+
+/** お札の面（2026-11-25 オーナー決定：案A 紙幣風）。生成りの紙に色インクの二重の枠と右の色帯、すかしの丸、
+ *  大きいときだけ四隅に小さな数字、紙の反りの光。肖像・地紋は描かない。(0,0) を中心に幅 w・高さ h */
+function billFace(ctx: CanvasRenderingContext2D, ink: string, w: number, h: number, corner: number, words: string, cornerNum: string) {
+  roundRect(ctx, -w / 2, -h / 2, w, h, corner * 0.5);
   const g = ctx.createLinearGradient(0, -h / 2, 0, h / 2);
-  g.addColorStop(0, shade(c, 0.5));
-  g.addColorStop(0.35, shade(c, 0.25));
-  g.addColorStop(1, shade(c, -0.15));
+  g.addColorStop(0, '#fbf8ef');
+  g.addColorStop(0.5, '#f1ebdc');
+  g.addColorStop(1, '#ded6c3');
   ctx.fillStyle = g;
   ctx.fill();
-  ctx.lineWidth = Math.max(0.8, h * 0.03);
-  ctx.strokeStyle = shade(c, -0.4);
+  ctx.lineWidth = Math.max(0.8, h * 0.02);
+  ctx.strokeStyle = '#a89f8a';
   ctx.stroke();
-  // 内側の枠
-  const m = h * 0.12;
-  roundRect(ctx, -w / 2 + m, -h / 2 + m, w - m * 2, h - m * 2, corner * 0.5);
-  ctx.lineWidth = Math.max(0.6, h * 0.025);
-  ctx.strokeStyle = shade(c, -0.25);
+  // インクの枠（二重線）
+  const m = h * 0.08;
+  roundRect(ctx, -w / 2 + m, -h / 2 + m, w - m * 2, h - m * 2, corner * 0.3);
+  ctx.lineWidth = Math.max(1, h * 0.05);
+  ctx.strokeStyle = shade(ink, -0.15);
   ctx.stroke();
-  // 左の丸い空き（すかしの場所。模様は描かない）
+  const m2 = m + h * 0.07;
+  roundRect(ctx, -w / 2 + m2, -h / 2 + m2, w - m2 * 2, h - m2 * 2, corner * 0.2);
+  ctx.lineWidth = Math.max(0.5, h * 0.015);
+  ctx.stroke();
+  // 右の色帯
+  const bw = w * 0.2;
+  ctx.fillStyle = shade(ink, 0.2);
+  ctx.fillRect(w / 2 - m2 - bw, -h / 2 + m2, bw, h - m2 * 2);
+  // すかしの丸（左）
+  const wx = -w * 0.28;
   ctx.beginPath();
-  ctx.ellipse(-w * 0.3, 0, h * 0.2, h * 0.26, 0, 0, Math.PI * 2);
-  ctx.fillStyle = shade(c, 0.55);
+  ctx.ellipse(wx, 0, h * 0.2, h * 0.24, 0, 0, Math.PI * 2);
+  const wm = ctx.createRadialGradient(wx, 0, 0, wx, 0, h * 0.24);
+  wm.addColorStop(0, '#ffffff');
+  wm.addColorStop(1, '#ebe4d3');
+  ctx.fillStyle = wm;
   ctx.fill();
-  if (words) label(ctx, words, w * 0.1, 0, h * 0.4, w * 0.55, shade(c, -0.7));
-  // 上のつや
-  roundRect(ctx, -w / 2 + corner, -h / 2 + h * 0.04, w - corner * 2, h * 0.14, h * 0.07);
-  ctx.fillStyle = 'rgba(255,255,255,0.25)';
+  // 四隅の数字（大きいときだけ）
+  if (cornerNum && h >= BILL_DETAIL_MIN_H) {
+    label(ctx, cornerNum, -w / 2 + m2 + h * 0.13, -h / 2 + m2 + h * 0.1, h * 0.16, w * 0.15, shade(ink, -0.45));
+    label(ctx, cornerNum, w / 2 - m2 - h * 0.13, h / 2 - m2 - h * 0.1, h * 0.16, w * 0.15, '#ffffff');
+  }
+  if (words) label(ctx, words, 0, 0, h * 0.36, w * 0.44, shade(ink, -0.6));
+  // 紙の反り（上が明るい）
+  roundRect(ctx, -w / 2, -h / 2, w, h * 0.45, corner * 0.5);
+  ctx.fillStyle = 'rgba(255,255,255,0.18)';
   ctx.fill();
 }
 
-/** 束：横から見た厚み（お札の重なり）＋上のお札＋帯 */
+/** お札の四隅の数字（1万円札なら「1」、千円札なら「1000」） */
+const billNumber = (value: number) => String(value >= 10_000 ? value / 10_000 : value);
+
+/** お札 */
+function drawBill(ctx: CanvasRenderingContext2D, tr: Tier, w: number, h: number, corner: number, words: string) {
+  billFace(ctx, tr.color, w, h, corner, words, billNumber(tr.value));
+}
+
+/** 束の上に見えるお札のインクの色：一番高いお札（1万円札）の色 */
+const BUNDLE_INK = [...currency.tiers].reverse().find((t) => t.look === 'bill')?.color ?? '#C9B38A';
+
+/** 束：横から見た厚み（お札の重なり）＋上のお札（案A の面）＋帯 */
 function drawBundle(ctx: CanvasRenderingContext2D, tr: Tier, w: number, h: number, corner: number, words: string) {
   const c = tr.color;
   const side = h * 0.28; // 厚みの部分
   const faceH = h - side;
-  // 厚み（下と右に見える紙の重なり）
+  // 厚み（紙の重なり。束ごとの色を少し混ぜる）
   roundRect(ctx, -w / 2, -h / 2, w, h, corner);
-  ctx.fillStyle = shade(c, -0.35);
+  const sg = ctx.createLinearGradient(0, -h / 2 + faceH, 0, h / 2);
+  sg.addColorStop(0, shade(c, 0.35));
+  sg.addColorStop(1, shade(c, -0.25));
+  ctx.fillStyle = sg;
   ctx.fill();
   const lines = tr.value >= 10_000_000 ? 7 : 5;
   ctx.lineWidth = Math.max(0.5, h * 0.012);
-  ctx.strokeStyle = shade(c, 0.35);
+  ctx.strokeStyle = 'rgba(255,255,255,0.55)';
   for (let i = 1; i <= lines; i++) {
     const y = -h / 2 + faceH + (side * i) / (lines + 1);
     ctx.beginPath();
@@ -161,18 +195,15 @@ function drawBundle(ctx: CanvasRenderingContext2D, tr: Tier, w: number, h: numbe
     ctx.lineTo(w / 2 - corner * 0.6, y);
     ctx.stroke();
   }
-  // 上のお札
-  roundRect(ctx, -w / 2, -h / 2, w, faceH, corner);
-  const g = ctx.createLinearGradient(-w / 2, -h / 2, w / 2, faceH - h / 2);
-  g.addColorStop(0, shade(c, 0.45));
-  g.addColorStop(1, shade(c, -0.05));
-  ctx.fillStyle = g;
-  ctx.fill();
+  roundRect(ctx, -w / 2, -h / 2, w, h, corner);
   ctx.lineWidth = Math.max(0.8, h * 0.025);
   ctx.strokeStyle = shade(c, -0.45);
   ctx.stroke();
-  roundRect(ctx, -w / 2, -h / 2, w, h, corner);
-  ctx.stroke();
+  // 上のお札（金額は帯の右に書くので、ここでは書かない）
+  ctx.save();
+  ctx.translate(0, -h / 2 + faceH / 2);
+  billFace(ctx, BUNDLE_INK, w, faceH, corner, '', '');
+  ctx.restore();
   // 帯（左寄り。厚みの部分まで回り込む）
   const bx = -w * 0.3;
   const bw = w * 0.13;
@@ -244,37 +275,49 @@ export function drawMoney(ctx: CanvasRenderingContext2D, tier: number, r: number
 /** かぶ（株）の玉を描く（2026-11-25 オーナー決定）。物理の形は円のまま。
  *  色は平均取得価額と今の株価で決まる（全部のかぶが同じ色）：同じなら白、上がると金、下がると黒 */
 export function drawTurnip(ctx: CanvasRenderingContext2D, r: number, color: string): void {
-  // 葉（3枚。葉脈つき）
+  // 葉（3枚。大きめ・葉脈つき。2026-11-25 オーナー指定で大きく）。付け根から先へ、ふっくらした楕円
+  const baseY = -r * 0.42;
   const leaves: [number, number][] = [
-    [-0.42, -0.95],
-    [0.42, -0.95],
-    [0, -1.0],
+    [-0.72, -1.12],
+    [0.72, -1.12],
+    [0, -1.28],
   ];
   for (const [lx, ly] of leaves) {
     const tipX = lx * r;
-    const tipY = ly * r * 0.92;
+    const tipY = ly * r;
+    const len = Math.hypot(tipX, tipY - baseY);
+    const ang = Math.atan2(tipY - baseY, tipX);
+    ctx.save();
+    ctx.translate(0, baseY);
+    ctx.rotate(ang);
     ctx.beginPath();
-    ctx.moveTo(0, -r * 0.5);
-    ctx.quadraticCurveTo(lx * r * 1.25, -r * 0.62, tipX, tipY);
-    ctx.quadraticCurveTo(lx * r * 0.35, -r * 0.72, 0, -r * 0.5);
-    const lg = ctx.createLinearGradient(0, -r * 0.5, tipX, tipY);
-    lg.addColorStop(0, '#3f8a2e');
-    lg.addColorStop(1, '#7cc35a');
+    ctx.ellipse(len / 2, 0, len / 2, len * 0.24, 0, 0, Math.PI * 2);
+    const lg = ctx.createLinearGradient(0, 0, len, 0);
+    lg.addColorStop(0, '#3a8229');
+    lg.addColorStop(1, '#86cc62');
     ctx.fillStyle = lg;
     ctx.fill();
-    ctx.lineWidth = Math.max(0.6, r * 0.03);
-    ctx.strokeStyle = '#2f6b22';
+    ctx.lineWidth = Math.max(0.6, r * 0.035);
+    ctx.strokeStyle = '#2b6420';
     ctx.stroke();
+    // 葉脈
     ctx.beginPath();
-    ctx.moveTo(0, -r * 0.52);
-    ctx.lineTo(tipX * 0.85, tipY * 0.9);
-    ctx.lineWidth = Math.max(0.5, r * 0.02);
-    ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+    ctx.moveTo(len * 0.05, 0);
+    ctx.lineTo(len * 0.9, 0);
+    for (const t of [0.35, 0.6]) {
+      ctx.moveTo(len * t, 0);
+      ctx.lineTo(len * (t + 0.15), -len * 0.13);
+      ctx.moveTo(len * t, 0);
+      ctx.lineTo(len * (t + 0.15), len * 0.13);
+    }
+    ctx.lineWidth = Math.max(0.5, r * 0.025);
+    ctx.strokeStyle = 'rgba(255,255,255,0.4)';
     ctx.stroke();
+    ctx.restore();
   }
   // 実（少し下に寄せた丸）と、下に細い根
-  const cy = r * 0.14;
-  const br = r * 0.8;
+  const cy = r * 0.18;
+  const br = r * 0.78;
   ctx.beginPath();
   ctx.moveTo(-r * 0.04, cy + br * 0.95);
   ctx.quadraticCurveTo(0, r * 1.04, r * 0.05, r * 1.0);
