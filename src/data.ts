@@ -8,8 +8,8 @@ import { halfWidth, moneyShape } from './core/shapes';
 import type { Config, Currency } from './core/types';
 import type { Locale } from './i18n/types';
 
-/** 段の数（決定 #4） */
-const TIER_COUNT = 12;
+/** 段の数（決定 #4。2026-11-25 に5千円札を足して13段） */
+const TIER_COUNT = 13;
 /** 降るお金の種類（決定 #5。小さい方から） */
 const DROP_COUNT = 5;
 const LOOKS = ['coin', 'bill', 'bundle', 'case'];

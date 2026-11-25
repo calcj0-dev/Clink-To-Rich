@@ -1,11 +1,11 @@
-// 進化の輪（設計書 2章 M3）：12段を小さく並べ、タップでそのお金のひとことを吹き出しで出す
+// 進化の輪（設計書 2章 M3）：13段を小さく並べ、タップでそのお金のひとことを吹き出しで出す
 
 import { currency } from '../../data';
 import { getLocale } from '../../i18n';
 import { h } from '../dom';
 import { drawMoney } from '../render';
 
-const SIZE = 30;
+const SIZE = 26;
 const BUBBLE_MS = 2600;
 
 export function evolutionRing(): { el: HTMLElement; dispose: () => void } {

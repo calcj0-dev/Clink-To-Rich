@@ -57,7 +57,7 @@ export function previewOg(): void {
   // お金の段を小さい方から並べる（大きさの増え方が分かるように）＋かぶ
   const tiers = currency.tiers;
   const maxR = tiers[tiers.length - 1]!.radius;
-  const k = 84 / maxR;
+  const k = 76 / maxR;
   let x = 40;
   const base = 545;
   const items = tiers.map((tr, i) => ({ i, r: Math.max(12, tr.radius * k) }));

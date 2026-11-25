@@ -11,15 +11,16 @@ describe('T-01 データの検査', () => {
     expect(check(config, currency)).toEqual([]);
   });
 
-  it('今のデータの中身：12段・降るのは5種類・株の玉は100円玉と同じ大きさ・1株1万円から', () => {
-    expect(currency.tiers).toHaveLength(12);
+  it('今のデータの中身：13段（5千円札あり）・降るのは5種類・株の玉は100円玉と同じ大きさ・1株1万円から', () => {
+    expect(currency.tiers).toHaveLength(13);
+    expect(currency.tiers.map((t) => t.value).slice(6, 9)).toEqual([1000, 5000, 10000]);
     expect(Object.keys(currency.drops)).toEqual(['y1', 'y5', 'y10', 'y50', 'y100']);
     expect(config.stock.radius).toBe(currency.tiers.find((t) => t.id === 'y100')!.radius);
     expect(currency.stock.startPrice).toBe(10000);
     expect(config.links.portal.startsWith('https://app-lab-rust.vercel.app')).toBe(true);
   });
 
-  it('段が11個だと止まる', () => {
+  it('段が1つ足りないと止まる', () => {
     expect(check(config, curWith((c) => c.tiers.splice(5, 1)))).not.toEqual([]);
   });
 
