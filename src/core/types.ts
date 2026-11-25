@@ -80,5 +80,5 @@ export type Config = {
   sounds: Record<string, string>;
   hashtag: string;
   storageKey: string;
-  links: { portal: string; tameru: string; tva: string; follow: string; vercelPrivacy: string };
+  links: { portal: string; tameru: string; tva: string; follow: string; vercelPrivacy: string; xIntent: string };
 };

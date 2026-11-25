@@ -10,6 +10,9 @@ import type { MessageKey } from '../../i18n/types';
 import { money } from '../../money';
 import type { ScreenFactory } from '../app';
 import { button, externalLink, h, linkButton } from '../dom';
+import { postText } from '../../share/postText';
+import { resultImageBlob } from '../../share/resultImage';
+import { canShareImage, openXIntent, saveImage, shareWithImage } from '../../share/share';
 import { openPrivacy } from '../modals';
 import { drawSnapshot } from '../render';
 
@@ -38,6 +41,22 @@ export const resultScreen: ScreenFactory = (app) => {
     drawSnapshot(ctx, r.box);
   }
 
+  // シェアと画像の保存（設計書 5.5）。結果画像は先に作っておく（押してから作ると Web Share が使えない端末がある）
+  const text = postText(r);
+  let blob: Blob | null = null;
+  const shareBtn = button(t('result.share'), () => {
+    if (blob && canShareImage(blob)) void shareWithImage(text, blob);
+    else openXIntent(text);
+  }, 'btn btn-share');
+  const saveBtn = button(t('result.save'), () => {
+    if (blob) void saveImage(blob);
+  }, 'btn');
+  saveBtn.disabled = true;
+  void resultImageBlob(r).then((b) => {
+    blob = b;
+    saveBtn.disabled = !b;
+  });
+
   const stockLine =
     r.shares === 0
       ? t('result.noStock')
@@ -62,11 +81,7 @@ export const resultScreen: ScreenFactory = (app) => {
       h('p', { className: 'result-title-line', text: t(`titleLines.${r.title}` as MessageKey) }),
     ]),
     h('p', { className: r.newBest ? 'result-best new' : 'result-best', text: r.newBest ? t('result.newBest') : t('result.best', { yen: money(r.best) }) }),
-    // シェアと画像の保存は #6 で動かす
-    h('div', { className: 'result-actions' }, [
-      h('button', { className: 'btn btn-share', text: t('result.share'), attrs: { type: 'button', disabled: '' } }),
-      h('button', { className: 'btn', text: t('result.save'), attrs: { type: 'button', disabled: '' } }),
-    ]),
+    h('div', { className: 'result-actions' }, [shareBtn, saveBtn]),
     button(t('result.retry'), () => app.go('play'), 'btn btn-primary btn-retry'),
     linkButton(t('result.toTitle'), () => app.go('title')),
     h('div', { className: 'tameru-box' }, [
