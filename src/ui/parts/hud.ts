@@ -5,6 +5,7 @@ import { t } from '../../i18n';
 import { money } from '../../money';
 import { h } from '../dom';
 import { drawMoney } from '../render';
+import { soundButton } from './soundButton';
 
 const NEXT_SIZE = 40;
 
@@ -23,11 +24,13 @@ export function hud() {
   nextCanvas.height = NEXT_SIZE * dpr;
   const nctx = nextCanvas.getContext('2d');
   let shownNext = -1;
+  const sound = soundButton();
 
   const el = h('header', { className: 'hud' }, [
     h('div', { className: 'hud-main' }, [
       h('div', { className: 'hud-money' }, [total, h('div', { className: 'hud-sub' }, [cash, stock])]),
       h('div', { className: 'hud-next' }, [h('span', { className: 'hud-next-label', text: t('hud.next') }), nextCanvas]),
+      sound.el,
     ]),
   ]);
 
@@ -57,5 +60,10 @@ export function hud() {
     flashTimer = window.setTimeout(() => stock.classList.remove('flash'), 1200);
   }
 
-  return { el, update, flashStock, dispose: () => clearTimeout(flashTimer) };
+  function dispose() {
+    clearTimeout(flashTimer);
+    sound.dispose();
+  }
+
+  return { el, update, flashStock, dispose };
 }

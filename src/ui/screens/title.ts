@@ -1,5 +1,4 @@
 // S1 タイトル（設計書 2章）：名前、一言、はじめる、右上にバージョン、遊び方、ベスト、免責、まとめサイトへのリンク、クレジット、プライバシー
-// 音のボタンは #7 で足す
 
 import { config } from '../../data';
 import { t } from '../../i18n';
@@ -9,11 +8,13 @@ import { APP_VERSION } from '../../version';
 import type { ScreenFactory } from '../app';
 import { button, externalLink, h, linkButton } from '../dom';
 import { openHow, openPrivacy } from '../modals';
+import { soundButton } from '../parts/soundButton';
 
 export const titleScreen: ScreenFactory = (app) => {
   const best = Number(load('best', '0'));
+  const sound = soundButton();
   const el = h('section', { className: 'screen screen-title' }, [
-    h('div', { className: 'top-bar' }, [h('span', { className: 'version', text: t('title.version', { version: APP_VERSION }) })]),
+    h('div', { className: 'top-bar' }, [h('span', { className: 'version', text: t('title.version', { version: APP_VERSION }) }), sound.el]),
     h('h1', { className: 'title', text: t('meta.name') }),
     h('p', { className: 'tagline', text: t('meta.tagline') }),
     button(t('title.start'), () => app.go('play'), 'btn btn-primary btn-start'),
@@ -26,5 +27,5 @@ export const titleScreen: ScreenFactory = (app) => {
       h('p', {}, [linkButton(t('privacy.title'), openPrivacy)]),
     ]),
   ]);
-  return { el };
+  return { el, unmount: sound.dispose };
 };

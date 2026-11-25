@@ -3,6 +3,7 @@
 
 import { config, currency } from '../../data';
 import { createGame, type GameEvent } from '../../core/game';
+import { playSound } from '../../audio';
 import { setLastResult } from '../../game/lastResult';
 import { t } from '../../i18n';
 import { money } from '../../money';
@@ -19,6 +20,19 @@ const MAX_FRAME_MS = 50;
 const TOAST_MS = 1600;
 /** 「貯金箱が割れました」を見せてから結果へ進むまで */
 const OVER_SHOW_MS = 1800;
+
+/** 出来事の効果音（設計書 1.9）。音の名前は config.json の sounds */
+function playEventSound(e: GameEvent): void {
+  const s = config.sounds;
+  const tiers = currency.tiers;
+  // 小さいお金ほど高い音（0〜1）
+  const pitch = (tier: number) => tier / Math.max(1, tiers.length - 1);
+  if (e.type === 'drop') playSound(s.coin, pitch(e.tier));
+  else if (e.type === 'merge') playSound(s[tiers[e.to]?.look ?? 'coin'], pitch(e.to));
+  else if (e.type === 'crash') playSound(s.crash);
+  else if (e.type === 'oku') playSound(s.oku);
+  else if (e.type === 'over') playSound(s.over);
+}
 
 export const playScreen: ScreenFactory = (app) => {
   const game = createGame(config, currency, Math.floor(Math.random() * 2 ** 31));
@@ -112,6 +126,7 @@ export const playScreen: ScreenFactory = (app) => {
     toastTimer = window.setTimeout(() => (toast.className = 'toast'), TOAST_MS);
   };
   const offEvent = game.onEvent((e: GameEvent) => {
+    playEventSound(e);
     if (e.type === 'oku') showToast(t('events.oku'), 'toast-oku');
     if (e.type === 'crash') {
       showToast(t('events.crash'), 'toast-crash');

@@ -1,6 +1,7 @@
 // かぶ（株価）の画面（2026-11-25 オーナー決定）：下の「かぶ」ボタンで開く。
 // 株価のチャートを見て「買」で1株ずつ買える。「売」はなし。開いている間は玉の動きを止め、買ったかぶは閉じたら降る
 
+import { playSound } from '../../audio';
 import type { Game } from '../../core/game';
 import { turnipColor } from '../../core/rules';
 import { t } from '../../i18n';
@@ -76,7 +77,10 @@ export function openKabuPanel(game: Game, onClose: () => void): void {
   const status = h('p', { className: 'kabu-status', attrs: { role: 'status', 'aria-live': 'polite' } });
   const buyBtn = button(t('kabu.buy'), () => {
     const p = game.price();
-    if (game.buy()) status.textContent = t('buy.done', { yen: money(p) });
+    if (game.buy()) {
+      status.textContent = t('buy.done', { yen: money(p) });
+      playSound(game.config.sounds.buy);
+    }
     refresh();
   }, 'btn btn-kabu-buy');
 

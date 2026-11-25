@@ -1,4 +1,6 @@
 import './style.css';
+import { initAnalytics } from './analytics';
+import { unlockAudio } from './audio';
 import { setLocale } from './i18n';
 import { createApp } from './ui/app';
 import { playScreen } from './ui/screens/play';
@@ -6,6 +8,10 @@ import { resultScreen } from './ui/screens/result';
 import { titleScreen } from './ui/screens/title';
 
 setLocale('ja');
+initAnalytics();
+// iOS では利用者が触ったときに音を鳴らせるようにする
+document.addEventListener('pointerdown', unlockAudio, { capture: true });
+document.addEventListener('keydown', unlockAudio, { capture: true });
 
 const root = document.querySelector<HTMLElement>('#app');
 if (root) {
