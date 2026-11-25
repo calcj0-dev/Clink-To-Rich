@@ -10,6 +10,7 @@ import type { MessageKey } from '../../i18n/types';
 import { money } from '../../money';
 import type { ScreenFactory } from '../app';
 import { button, externalLink, h, linkButton } from '../dom';
+import { openPrivacy } from '../modals';
 import { drawSnapshot } from '../render';
 
 /** 結果画面に出す貯金箱の絵の幅（CSS px） */
@@ -83,6 +84,7 @@ export const resultScreen: ScreenFactory = (app) => {
       externalLink(t('result.portal'), config.links.portal),
     ]),
     h('p', { className: 'disclaimer', text: t('title.disclaimer') }),
+    h('p', {}, [linkButton(t('privacy.title'), openPrivacy)]),
   ]);
   return { el };
 };

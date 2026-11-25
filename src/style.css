@@ -587,3 +587,12 @@ button {
   flex-direction: column;
   font-size: 13px;
 }
+
+.privacy-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  text-align: left;
+  margin-bottom: 16px;
+}
