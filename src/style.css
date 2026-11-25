@@ -467,3 +467,123 @@ button {
   0%, 40% { color: #e23b3b; font-weight: 800; }
   100% { color: inherit; }
 }
+
+/* ---- S3 結果 ---- */
+.screen-result {
+  text-align: center;
+  gap: 10px;
+  padding-bottom: 28px;
+}
+
+.result-heading {
+  margin: 14px 0 0;
+  font-size: 18px;
+  color: var(--text-sub);
+}
+
+.result-top {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  text-align: left;
+}
+
+.result-box {
+  flex: none;
+  border-radius: 0 0 8px 8px;
+}
+
+.result-nums {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.result-total {
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.result-sub {
+  font-size: 13px;
+  color: var(--text-sub);
+}
+
+.result-title {
+  background: #fbf6ea;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.result-title-name {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--gold);
+}
+
+.result-title-line {
+  font-size: 14px;
+}
+
+.result-best {
+  font-weight: 700;
+}
+
+.result-best.new {
+  color: #e23b3b;
+}
+
+.result-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.btn-share {
+  background: #1a1f2b;
+  border-color: #1a1f2b;
+  color: #fff;
+}
+
+.btn-retry {
+  font-size: 18px;
+  padding: 12px;
+}
+
+.tameru-box {
+  margin-top: 10px;
+  border: 1px solid #e6dfcf;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.apps-heading {
+  font-size: 12px;
+  color: var(--text-sub);
+}
+
+.tameru-heading {
+  font-weight: 800;
+}
+
+.tameru-body {
+  font-size: 13px;
+  color: var(--text-sub);
+}
+
+.tameru-btn {
+  display: inline-block;
+  text-decoration: none;
+  align-self: center;
+}
+
+.result-links {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+}

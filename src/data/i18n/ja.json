@@ -64,15 +64,17 @@
     "title": "称号：{title}",
     "best": "ベスト {yen}",
     "newBest": "ベスト更新！",
-    "moral": "お金は寝かせるより働かせる",
     "share": "Xでシェア",
     "save": "画像を保存",
     "retry": "もう一回",
     "apps": "このゲームを作った人のアプリ",
-    "tameru": "TAMERU",
-    "tva": "積立投資を超えろ！",
-    "follow": "フォローする",
-    "portal": "ほかのアプリ（Ted App Lab）"
+    "follow": "開発者をXでフォロー @shooojp19",
+    "portal": "ほかのゲームでも遊ぶ（Ted App Lab）",
+    "stockLoss": "株で減った額 −{yen}（買った額 {paid}）",
+    "toTitle": "タイトルへ",
+    "tameruHeading": "本物のお金の記録は TAMERU で",
+    "tameruBody": "資産の推移とポートフォリオの構成比が、ひと目で分かる無料アプリ。口座連携なしで使えます。このゲームの開発者が作っています",
+    "tameruButton": "TAMERU を見てみる"
   },
   "share": {
     "text": "億までチャリンで{total}（現金 {cash}／株 {stock}）。称号：{title} #{hashtag}"

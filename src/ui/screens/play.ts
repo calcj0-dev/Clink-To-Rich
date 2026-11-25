@@ -3,18 +3,22 @@
 
 import { config, currency } from '../../data';
 import { createGame, type GameEvent } from '../../core/game';
+import { setLastResult } from '../../game/lastResult';
 import { t } from '../../i18n';
 import { money } from '../../money';
+import { load, save } from '../../storage';
 import type { ScreenFactory } from '../app';
-import { button, h } from '../dom';
+import { h } from '../dom';
 import { evolutionRing } from '../parts/evolution';
 import { hud } from '../parts/hud';
 import { openKabuPanel } from '../parts/kabuPanel';
-import { drawBox } from '../render';
+import { drawBox, snapshotBox } from '../render';
 
 /** 1フレームで進める時間の上限（タブを戻したときに一気に進まないように） */
 const MAX_FRAME_MS = 50;
 const TOAST_MS = 1600;
+/** 「貯金箱が割れました」を見せてから結果へ進むまで */
+const OVER_SHOW_MS = 1800;
 
 export const playScreen: ScreenFactory = (app) => {
   const game = createGame(config, currency, Math.floor(Math.random() * 2 ** 31));
@@ -119,16 +123,23 @@ export const playScreen: ScreenFactory = (app) => {
     if (e.type === 'over') showOver();
   });
 
+  /** 「貯金箱が割れました」を少し見せてから結果へ。ベストはここで端末に保存する */
+  let overTimer = 0;
   function showOver() {
+    const result = game.result();
+    const prevBest = Number(load('best', '0')) || 0;
+    const newBest = result.total > prevBest;
+    if (newBest) save('best', String(result.total));
+    setLastResult({ ...result, box: snapshotBox(game), newBest, best: Math.max(prevBest, result.total) });
+
     overlay.replaceChildren(
       h('div', { className: 'over-card' }, [
         h('p', { className: 'over-title', text: t('events.over') }),
-        h('p', { className: 'over-total', text: t('result.total', { yen: money(game.total()) }) }),
-        h('p', { className: 'over-sub', text: t('result.breakdown', { cash: money(game.cash()), stock: money(game.stockValue()) }) }),
-        button(t('result.retry'), () => app.go('play'), 'btn btn-primary'),
+        h('p', { className: 'over-total', text: t('result.total', { yen: money(result.total) }) }),
       ]),
     );
     overlay.hidden = false;
+    overTimer = window.setTimeout(() => app.go('result'), OVER_SHOW_MS);
   }
 
   // 開発用：?demo=40 で40玉を自動で落としてから始める（見た目の確認用。公開版では無視する）
@@ -172,6 +183,7 @@ export const playScreen: ScreenFactory = (app) => {
       cancelAnimationFrame(raf);
       ro.disconnect();
       clearTimeout(toastTimer);
+      clearTimeout(overTimer);
       offEvent();
       evo.dispose();
       top.dispose();

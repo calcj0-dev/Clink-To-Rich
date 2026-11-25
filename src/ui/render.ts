@@ -174,6 +174,66 @@ export function drawTurnip(ctx: CanvasRenderingContext2D, r: number, color: stri
 
 export type DrawState = { now: number; showHeld: boolean };
 
+/** 終わった瞬間の貯金箱の中身（結果画面・結果画像で描き直すため） */
+export type BoxSnapshot = {
+  width: number;
+  height: number;
+  dangerLineY: number;
+  turnipColor: string;
+  balls: { kind: 'money' | 'stock'; x: number; y: number; r: number; angle: number; tier: number; oku: number }[];
+};
+
+export function snapshotBox(game: Game): BoxSnapshot {
+  const { width, height, dangerLineY } = game.config.box;
+  return {
+    width,
+    height,
+    dangerLineY,
+    turnipColor: turnipColor(game.price(), game.avgCost(), game.config.stock.color),
+    balls: game.world.balls().map((b) => ({
+      kind: b.kind,
+      x: b.body.position.x,
+      y: b.body.position.y,
+      r: b.body.circleRadius ?? 10,
+      angle: b.body.angle,
+      tier: b.kind === 'money' ? b.tier : -1,
+      oku: b.kind === 'money' ? b.oku || 1 : 0,
+    })),
+  };
+}
+
+/** 貯金箱の中身の絵を (0,0) から幅 width × 高さ height（箱の座標）で描く。外側で scale しておく */
+export function drawSnapshot(ctx: CanvasRenderingContext2D, s: BoxSnapshot): void {
+  ctx.fillStyle = '#fbf6ea';
+  ctx.fillRect(0, 0, s.width, s.height);
+  ctx.save();
+  ctx.strokeStyle = 'rgba(226,59,59,0.35)';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([10, 8]);
+  ctx.beginPath();
+  ctx.moveTo(0, s.dangerLineY);
+  ctx.lineTo(s.width, s.dangerLineY);
+  ctx.stroke();
+  ctx.restore();
+  for (const b of s.balls) {
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    ctx.rotate(b.angle);
+    if (b.kind === 'money') drawMoney(ctx, b.tier, b.r, b.oku);
+    else drawTurnip(ctx, b.r, s.turnipColor);
+    ctx.restore();
+  }
+  // 箱の枠（左右と底）
+  ctx.strokeStyle = '#c8b88f';
+  ctx.lineWidth = 6;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(0, s.height);
+  ctx.lineTo(s.width, s.height);
+  ctx.lineTo(s.width, 0);
+  ctx.stroke();
+}
+
 /** 貯金箱の中身（箱の座標。幅 box.width × 高さ box.height） */
 export function drawBox(ctx: CanvasRenderingContext2D, game: Game, s: DrawState): void {
   const { width: W, height: H, dangerLineY, dropY } = game.config.box;
