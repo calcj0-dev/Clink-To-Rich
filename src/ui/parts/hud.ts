@@ -14,7 +14,8 @@ function setText(el: HTMLElement, text: string) {
   if (el.textContent !== text) el.textContent = text;
 }
 
-export function hud() {
+/** menuButton は右上（音のボタンの左）に置く一時停止のボタン */
+export function hud(menuButton: HTMLElement) {
   const total = h('div', { className: 'hud-total' });
   const cash = h('span', { className: 'hud-cash' });
   const stock = h('span', { className: 'hud-stock' });
@@ -30,7 +31,7 @@ export function hud() {
     h('div', { className: 'hud-main' }, [
       h('div', { className: 'hud-money' }, [total, h('div', { className: 'hud-sub' }, [cash, stock])]),
       h('div', { className: 'hud-next' }, [h('span', { className: 'hud-next-label', text: t('hud.next') }), nextCanvas]),
-      sound.el,
+      h('div', { className: 'hud-buttons' }, [menuButton, sound.el]),
     ]),
   ]);
 

@@ -11,9 +11,10 @@ import { settings } from '../../settings';
 import { load, save } from '../../storage';
 import type { ScreenFactory } from '../app';
 import { h } from '../dom';
-import { evolutionRing } from '../parts/evolution';
+import { openMoneyPanel } from '../parts/evolution';
 import { hud } from '../parts/hud';
 import { openKabuPanel } from '../parts/kabuPanel';
+import { openPauseMenu, pauseButton } from '../parts/pauseMenu';
 import { drawBox, snapshotBox } from '../render';
 
 /** 1フレームで進める時間の上限（タブを戻したときに一気に進まないように） */
@@ -40,8 +41,20 @@ export const playScreen: ScreenFactory = (app) => {
   const W = config.box.width;
   const H = config.box.height;
 
-  const top = hud();
-  const evo = evolutionRing();
+  let aiming = false;
+  // 一時停止・お金の種類・かぶの画面を開いている間は玉の動きを止める
+  let paused = false;
+  const pause = (open: (resume: () => void) => void) => {
+    if (game.over || paused) return;
+    paused = true;
+    aiming = false;
+    open(() => {
+      paused = false;
+    });
+  };
+  const top = hud(pauseButton(() => pause((resume) => openPauseMenu(resume, () => app.go('title')))));
+  const moneyBtn = h('button', { className: 'btn btn-money', text: t('evo.button'), attrs: { type: 'button' } });
+  moneyBtn.addEventListener('click', () => pause((resume) => openMoneyPanel(resume)));
   const canvas = h('canvas', { className: 'box-canvas' });
   const toast = h('div', { className: 'toast', attrs: { role: 'status', 'aria-live': 'polite' } });
   const stage = h('div', { className: 'stage' }, [canvas, toast]);
@@ -55,9 +68,7 @@ export const playScreen: ScreenFactory = (app) => {
   const el = h('section', { className: 'screen screen-play' }, [
     top.el,
     stage,
-    evo.el,
-    buyBtn,
-    h('p', { className: 'game-note', text: t('hud.gameNote') }),
+    h('div', { className: 'bottom-row' }, [moneyBtn, buyBtn]),
     overlay,
   ]);
 
@@ -82,8 +93,7 @@ export const playScreen: ScreenFactory = (app) => {
     const r = canvas.getBoundingClientRect();
     return ((clientX - r.left) / r.width) * W;
   };
-  let aiming = false;
-  const isControl = (e: Event) => (e.target as HTMLElement).closest('button, .evo, .over') !== null;
+  const isControl = (e: Event) => (e.target as HTMLElement).closest('button, .over') !== null;
   const onDown = (e: PointerEvent) => {
     if (isControl(e) || game.over) return;
     aiming = true;
@@ -107,16 +117,8 @@ export const playScreen: ScreenFactory = (app) => {
   window.addEventListener('pointerup', onUp);
   window.addEventListener('pointercancel', onCancel);
 
-  // ---- かぶ：チャートを開く。開いている間は玉の動きを止める ----
-  let paused = false;
-  buyBtn.addEventListener('click', () => {
-    if (game.over || paused) return;
-    paused = true;
-    aiming = false;
-    openKabuPanel(game, () => {
-      paused = false;
-    });
-  });
+  // ---- かぶ：チャートを開く ----
+  buyBtn.addEventListener('click', () => pause((resume) => openKabuPanel(game, resume)));
 
   // ---- 出来事 ----
   let toastTimer = 0;
@@ -170,6 +172,9 @@ export const playScreen: ScreenFactory = (app) => {
     const cm = q.get('chart'); // &chart=candle：チャートをローソク足に
     if (cm === 'line' || cm === 'candle') settings.chart = cm;
     if (q.has('panel')) queueMicrotask(() => buyBtn.click()); // &panel=1：かぶの画面を開く
+    // &open=money・menu：お金の種類・一時停止のメニューを開く
+    if (q.get('open') === 'money') queueMicrotask(() => moneyBtn.click());
+    if (q.get('open') === 'menu') queueMicrotask(() => el.querySelector<HTMLButtonElement>('.hud-buttons .icon-btn')?.click());
   }
 
   // ---- 毎フレーム ----
@@ -203,7 +208,6 @@ export const playScreen: ScreenFactory = (app) => {
       clearTimeout(toastTimer);
       clearTimeout(overTimer);
       offEvent();
-      evo.dispose();
       top.dispose();
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);

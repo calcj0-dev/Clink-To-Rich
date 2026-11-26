@@ -56,7 +56,6 @@ export function openKabuPanel(game: Game, onClose: () => void): void {
     cash,
     status,
     h('div', { className: 'kabu-actions' }, [buyBtn, button(t('common.close'), () => dialog.close(), 'btn')]),
-    h('p', { className: 'game-note', text: t('hud.gameNote') }),
   ]);
 
   const dpr = Math.min(window.devicePixelRatio || 1, 3);

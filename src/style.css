@@ -262,62 +262,27 @@ button {
   font-size: 30px;
 }
 
-.evo {
-  position: relative;
-  padding: 6px 0 4px;
-}
-
-.evo-row {
+.bottom-row {
   display: flex;
-  justify-content: space-between;
+  gap: 8px;
+  margin: 6px 0 4px;
 }
 
-.evo-item {
-  border: none;
-  background: none;
-  padding: 0;
-  width: 26px;
-  height: 26px;
-  cursor: pointer;
-}
-
-.evo-coin {
-  width: 26px;
-  height: 26px;
-  display: block;
-}
-
-.evo-bubble {
-  position: absolute;
-  bottom: 100%;
-  left: clamp(80px, var(--x, 50%), calc(100% - 80px));
-  transform: translateX(-50%);
-  background: #fff;
-  border: 1px solid #d9d2c2;
-  border-radius: 10px;
-  padding: 6px 10px;
-  font-size: 13px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.15s;
-  z-index: 2;
-}
-
-.evo-bubble.show {
-  opacity: 1;
+.btn-money {
+  flex: none;
+  padding: 12px 14px;
+  font-size: 14px;
+  background: #fff8e8;
+  border-color: #e3cf9a;
+  color: #7a5a12;
 }
 
 .btn-buy {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  margin: 4px 0 2px;
   padding: 12px;
   background: #3fa45b;
   border-color: #3fa45b;
@@ -640,4 +605,87 @@ button {
 
 .icon-btn:active {
   background: var(--surface);
+}
+
+/* ---- 右上のボタン（一時停止・音） ---- */
+.hud-buttons {
+  display: flex;
+  align-items: center;
+}
+
+.pause-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 220px;
+}
+
+/* ---- お金の種類 ---- */
+.evo-panel {
+  width: min(420px, 94vw);
+  text-align: center;
+}
+
+.evo-flow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  row-gap: 6px;
+  margin-bottom: 10px;
+}
+
+.evo-step {
+  display: flex;
+  align-items: center;
+}
+
+.evo-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 58px;
+  padding: 4px 2px;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  background: none;
+  cursor: pointer;
+}
+
+.evo-item.on {
+  border-color: var(--gold);
+  background: #fff8e8;
+}
+
+.evo-coin {
+  width: 46px;
+  height: 46px;
+  display: block;
+}
+
+.evo-name {
+  font-size: 10px;
+  line-height: 1.3;
+  color: var(--text-sub);
+  white-space: nowrap;
+}
+
+.evo-arrow {
+  color: #c8b88f;
+  font-weight: 800;
+  font-size: 14px;
+  margin: 0 1px 14px;
+}
+
+.evo-line {
+  min-height: 3.2em;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: var(--text-sub);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.evo-line strong {
+  color: var(--text);
 }
