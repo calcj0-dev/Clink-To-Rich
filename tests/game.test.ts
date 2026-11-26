@@ -5,6 +5,8 @@ import { createGame, type GameEvent } from '../src/core/game';
 import { cfgWith, tierIndex } from './helpers';
 
 const H = config.box.height;
+/** 1株の始まりの値段（今は 5,000円） */
+const P = currency.stock.startPrice;
 const moneyCount = (g: ReturnType<typeof createGame>) => g.world.balls().filter((b) => b.kind === 'money').length;
 const stockCount = (g: ReturnType<typeof createGame>) => g.world.balls().filter((b) => b.kind === 'stock').length;
 
@@ -13,7 +15,7 @@ describe('T-04 株を買う', () => {
     const g = createGame(config, currency, 1);
     g.world.addMoney(tierIndex('y1000'), 100, H - 44);
     expect(g.cash()).toBe(1000);
-    expect(g.price()).toBe(10000);
+    expect(g.price()).toBe(P);
     expect(g.canBuy()).toBe(false);
     expect(g.buy()).toBe(false);
     expect(stockCount(g)).toBe(0);
@@ -23,21 +25,21 @@ describe('T-04 株を買う', () => {
     const g = createGame(config, currency, 1);
     const events: GameEvent[] = [];
     g.onEvent((e) => events.push(e));
-    g.world.addMoney(tierIndex('y10000'), 60, H - 52);
-    g.world.addMoney(tierIndex('y1000'), 180, H - 44);
-    expect(g.cash()).toBe(11000);
+    g.world.addMoney(tierIndex('y5000'), 60, H - 48);
+    g.world.addMoney(tierIndex('y1000'), 200, H - 44);
+    expect(g.cash()).toBe(6000);
     const moneyBefore = moneyCount(g);
 
     expect(g.canBuy()).toBe(true);
     expect(g.buy()).toBe(true);
-    expect(g.cash()).toBe(1000);
+    expect(g.cash()).toBe(6000 - P);
     expect(g.play().shares).toBe(1);
-    expect(g.play().spent).toBe(10000);
+    expect(g.play().spent).toBe(P);
     expect(stockCount(g)).toBe(0); // かぶは時間が進んでから降る（チャートを閉じたら）
     g.update(20);
     expect(stockCount(g)).toBe(1);
     expect(moneyCount(g)).toBe(moneyBefore);
-    expect(events).toContainEqual({ type: 'buy', price: 10000, shares: 1, cash: 1000 });
+    expect(events).toContainEqual({ type: 'buy', price: P, shares: 1, cash: 6000 - P });
     expect(g.canBuy()).toBe(false);
   });
 
@@ -75,7 +77,7 @@ describe('T-04 株を買う', () => {
     g.world.addMoney(tierIndex('y100k'), 180, H - 63);
     g.buy();
     g.buy();
-    expect(g.avgCost()).toBe(10000);
+    expect(g.avgCost()).toBe(P);
   });
 
   it('合体でお金が増えると現金も増える（1円＋1円 → 5円で +3円）', () => {
@@ -84,9 +86,9 @@ describe('T-04 株を買う', () => {
     g.buy();
     g.world.addMoney(0, 280, H - 13);
     g.world.addMoney(0, 304, H - 13);
-    expect(g.cash()).toBe(2);
+    expect(g.cash()).toBe(10000 - P + 2);
     g.update(300);
-    expect(g.cash()).toBe(5);
+    expect(g.cash()).toBe(10000 - P + 5);
   });
 });
 
@@ -154,7 +156,7 @@ describe('T-07 点数', () => {
     expect(g.play().shares).toBe(1);
     expect(r.stock).toBe(r.shares * g.price());
     expect(r.total).toBe(r.cash + r.shares * g.price());
-    expect(r.stockGain).toBe(r.stock - 10000);
+    expect(r.stockGain).toBe(r.stock - P);
     expect(r.drops).toBe(20);
   });
 

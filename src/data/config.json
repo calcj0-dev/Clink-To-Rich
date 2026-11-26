@@ -32,8 +32,8 @@
     }
   },
   "stock": {
-    "radius": 33,
-    "drift": 0.02,
+    "radius": 27,
+    "drift": 0.018,
     "vol": 0.055,
     "crashProb": 0.008,
     "crashSize": 0.35,

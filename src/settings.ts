@@ -1,5 +1,6 @@
-// 利用者の設定（効果音のあり・なし）。端末に保存する（設計書 1.9・要件定義書 F-10）
+// 利用者の設定（効果音のあり・なし、チャートの表示）。端末に保存する（設計書 1.9・要件定義書 F-10）
 
+import type { ChartMode } from './ui/parts/chart';
 import { load, save } from './storage';
 
 type Listener = () => void;
@@ -12,6 +13,14 @@ export const settings = {
   },
   set sound(v: boolean) {
     save('sound', v ? 'on' : 'off');
+    for (const fn of listeners) fn();
+  },
+  /** チャートの表示。最初は線（2026-11-26 オーナー指定） */
+  get chart(): ChartMode {
+    return load('chart', 'line') === 'candle' ? 'candle' : 'line';
+  },
+  set chart(v: ChartMode) {
+    save('chart', v);
     for (const fn of listeners) fn();
   },
 };

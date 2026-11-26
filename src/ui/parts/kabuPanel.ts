@@ -7,68 +7,30 @@ import { turnipColor } from '../../core/rules';
 import { t } from '../../i18n';
 import { money } from '../../money';
 import { button, h } from '../dom';
+import { settings } from '../../settings';
 import { drawTurnip } from '../render';
+import { drawChart, type ChartMode } from './chart';
 
-/** チャートに出す玉の数（設計書 2章「最近60玉」） */
-const CHART_DROPS = 60;
-const CHART_W = 320;
-const CHART_H = 150;
 const ICON = 28;
-
-function drawChart(canvas: HTMLCanvasElement, history: readonly number[]): void {
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
-  const dpr = Math.min(window.devicePixelRatio || 1, 3);
-  canvas.width = CHART_W * dpr;
-  canvas.height = CHART_H * dpr;
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.clearRect(0, 0, CHART_W, CHART_H);
-
-  const pts = history.slice(-(CHART_DROPS + 1));
-  const lo = Math.min(...pts);
-  const hi = Math.max(...pts);
-  const pad = 10;
-  const span = hi - lo || hi * 0.1 || 1;
-  const x = (i: number) => pad + (i / Math.max(1, CHART_DROPS)) * (CHART_W - pad * 2);
-  const y = (v: number) => CHART_H - pad - ((v - lo) / span) * (CHART_H - pad * 2);
-
-  // 目盛りの代わりに薄い横線
-  ctx.strokeStyle = '#ece6d8';
-  ctx.lineWidth = 1;
-  for (let k = 0; k <= 3; k++) {
-    const yy = pad + (k / 3) * (CHART_H - pad * 2);
-    ctx.beginPath();
-    ctx.moveTo(pad, yy);
-    ctx.lineTo(CHART_W - pad, yy);
-    ctx.stroke();
-  }
-
-  // 面と線
-  ctx.beginPath();
-  pts.forEach((v, i) => (i === 0 ? ctx.moveTo(x(i), y(v)) : ctx.lineTo(x(i), y(v))));
-  ctx.lineTo(x(pts.length - 1), CHART_H - pad);
-  ctx.lineTo(x(0), CHART_H - pad);
-  ctx.closePath();
-  ctx.fillStyle = 'rgba(201,138,18,0.12)';
-  ctx.fill();
-  ctx.beginPath();
-  pts.forEach((v, i) => (i === 0 ? ctx.moveTo(x(i), y(v)) : ctx.lineTo(x(i), y(v))));
-  ctx.strokeStyle = '#c98a12';
-  ctx.lineWidth = 2;
-  ctx.lineJoin = 'round';
-  ctx.stroke();
-
-  // 今の株価の点
-  const last = pts.length - 1;
-  ctx.beginPath();
-  ctx.arc(x(last), y(pts[last]!), 4, 0, Math.PI * 2);
-  ctx.fillStyle = '#c98a12';
-  ctx.fill();
-}
 
 /** かぶの画面を開く。閉じたら onClose を呼ぶ */
 export function openKabuPanel(game: Game, onClose: () => void): void {
   const chart = h('canvas', { className: 'kabu-chart' });
+  // 線／ローソク足の切り替え（最初は線。選んだものは端末に保存）
+  const modeBtns = (['line', 'candle'] as ChartMode[]).map((m) =>
+    h('button', { className: 'seg-btn', text: t(m === 'line' ? 'kabu.line' : 'kabu.candle'), attrs: { type: 'button' } }),
+  );
+  const paintChart = () => {
+    const mode = settings.chart;
+    modeBtns.forEach((btn, i) => btn.setAttribute('aria-pressed', String((i === 0 ? 'line' : 'candle') === mode)));
+    drawChart(chart, { history: game.market.history, crashDrops: game.market.crashDrops, avgCost: game.avgCost(), mode });
+  };
+  modeBtns.forEach((btn, i) =>
+    btn.addEventListener('click', () => {
+      settings.chart = i === 0 ? 'line' : 'candle';
+      paintChart();
+    }),
+  );
   const price = h('p', { className: 'kabu-price' });
   const icon = h('canvas', { className: 'kabu-icon' });
   const held = h('span');
@@ -86,6 +48,7 @@ export function openKabuPanel(game: Game, onClose: () => void): void {
 
   const dialog = h('dialog', { className: 'modal kabu-panel' }, [
     h('h2', { className: 'modal-title', text: t('kabu.heading') }),
+    h('div', { className: 'seg' }, modeBtns),
     chart,
     price,
     h('p', { className: 'kabu-held' }, [icon, held]),
@@ -108,6 +71,7 @@ export function openKabuPanel(game: Game, onClose: () => void): void {
     avg.hidden = play.shares === 0;
     cash.textContent = t('kabu.cash', { yen: money(game.cash()) });
     buyBtn.disabled = !game.canBuy();
+    paintChart(); // 平均取得価額の線を合わせる
     const ictx = icon.getContext('2d');
     if (ictx) {
       ictx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -117,7 +81,6 @@ export function openKabuPanel(game: Game, onClose: () => void): void {
     }
   }
 
-  drawChart(chart, game.market.history);
   refresh();
   dialog.addEventListener('close', () => {
     dialog.remove();
@@ -128,4 +91,6 @@ export function openKabuPanel(game: Game, onClose: () => void): void {
   });
   document.body.append(dialog);
   dialog.showModal();
+  // 開いたときに切り替えボタンへ自動で付くフォーカスの枠を出さない
+  (document.activeElement as HTMLElement | null)?.blur();
 }

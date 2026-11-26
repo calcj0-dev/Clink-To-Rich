@@ -1,11 +1,11 @@
-// 端末への保存（設計書 1.6・5.3）。保存するのは音の設定とベストだけ。
+// 端末への保存（設計書 1.6・5.3）。保存するのは音・チャートの表示の設定とベストだけ。
 // 保存できない環境（プライベートブラウズなど）では初期値で動く
 
 import { config } from './data';
 
 const PREFIX = `${config.storageKey}.`;
 
-export type StorageKey = 'sound' | 'best';
+export type StorageKey = 'sound' | 'best' | 'chart';
 
 export function load(key: StorageKey, fallback: string): string {
   try {

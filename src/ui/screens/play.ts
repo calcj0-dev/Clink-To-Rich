@@ -7,6 +7,7 @@ import { playSound } from '../../audio';
 import { setLastResult } from '../../game/lastResult';
 import { t } from '../../i18n';
 import { money } from '../../money';
+import { settings } from '../../settings';
 import { load, save } from '../../storage';
 import type { ScreenFactory } from '../app';
 import { h } from '../dom';
@@ -166,6 +167,8 @@ export const playScreen: ScreenFactory = (app) => {
       if (q.has('kabu') && game.play().shares < 6) game.buy(); // &kabu=1：買えるときにかぶを買う（6株まで）
       game.update(700);
     }
+    const cm = q.get('chart'); // &chart=candle：チャートをローソク足に
+    if (cm === 'line' || cm === 'candle') settings.chart = cm;
     if (q.has('panel')) queueMicrotask(() => buyBtn.click()); // &panel=1：かぶの画面を開く
   }
 

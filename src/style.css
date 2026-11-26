@@ -388,11 +388,38 @@ button {
 .kabu-chart {
   width: 100%;
   max-width: 320px;
-  aspect-ratio: 320 / 150;
+  aspect-ratio: 320 / 190;
   display: block;
   margin: 0 auto 8px;
-  background: #fbf6ea;
-  border-radius: 8px;
+  background: #fffdf7;
+  border: 1px solid #ece6d8;
+  border-radius: 10px;
+}
+
+/* 線／ローソク足の切り替え */
+.seg {
+  display: inline-flex;
+  margin: 0 auto 8px;
+  padding: 3px;
+  background: #f3ecdb;
+  border-radius: 999px;
+}
+
+.seg-btn {
+  border: none;
+  background: transparent;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-sub);
+  cursor: pointer;
+}
+
+.seg-btn[aria-pressed='true'] {
+  background: #fff;
+  color: var(--text);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
 .kabu-price {

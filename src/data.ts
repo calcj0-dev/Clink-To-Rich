@@ -51,8 +51,8 @@ export function validateData(cfg: Config, cur: Currency, msgs: MessagesForCheck,
   );
   check(Object.values(cur.drops).every((w) => w > 0), 'drops: weights must be positive');
 
-  const biggestDrop = T[DROP_COUNT - 1];
-  check(biggestDrop && cfg.stock.radius === biggestDrop.radius, 'stock.radius: must equal the largest dropped coin');
+  // かぶの玉は降る硬貨のどれかと同じ大きさ（2026-11-26 オーナー決定：50円玉と同じ）
+  check(T.slice(0, DROP_COUNT).some((t) => t.radius === cfg.stock.radius), 'stock.radius: must equal one of the dropped coins');
   check(cur.stock.startPrice > 0 && cur.stock.minUnit > 0 && cur.stock.sigDigits >= 1, 'stock: startPrice/minUnit/sigDigits');
   const col = cfg.stock.color;
   const hex = /^#[0-9A-Fa-f]{6}$/;

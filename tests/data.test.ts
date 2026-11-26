@@ -11,12 +11,14 @@ describe('T-01 データの検査', () => {
     expect(check(config, currency)).toEqual([]);
   });
 
-  it('今のデータの中身：13段（5千円札あり）・降るのは5種類・株の玉は100円玉と同じ大きさ・1株1万円から', () => {
+  it('今のデータの中身：13段（5千円札あり）・降るのは5種類（同じ割合）・かぶの玉は50円玉と同じ大きさ・1株5,000円から・伸び1.8%', () => {
     expect(currency.tiers).toHaveLength(13);
     expect(currency.tiers.map((t) => t.value).slice(6, 9)).toEqual([1000, 5000, 10000]);
     expect(Object.keys(currency.drops)).toEqual(['y1', 'y5', 'y10', 'y50', 'y100']);
-    expect(config.stock.radius).toBe(currency.tiers.find((t) => t.id === 'y100')!.radius);
-    expect(currency.stock.startPrice).toBe(10000);
+    expect(Object.values(currency.drops)).toEqual([20, 20, 20, 20, 20]);
+    expect(config.stock.radius).toBe(currency.tiers.find((t) => t.id === 'y50')!.radius);
+    expect(currency.stock.startPrice).toBe(5000);
+    expect(config.stock.drift).toBe(0.018);
     expect(config.links.portal.startsWith('https://app-lab-rust.vercel.app')).toBe(true);
   });
 
@@ -42,7 +44,7 @@ describe('T-01 データの検査', () => {
     expect(validateData(config, currency, msgs)).not.toEqual([]);
   });
 
-  it('株の玉が100円玉と違う大きさだと止まる', () => {
+  it('かぶの玉が降る硬貨のどれとも違う大きさだと止まる', () => {
     expect(check(cfgWith((c) => (c.stock.radius = 20)), currency)).not.toEqual([]);
   });
 
