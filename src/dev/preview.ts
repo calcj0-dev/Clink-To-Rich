@@ -42,16 +42,23 @@ export function previewOg(): void {
   c.height = IMAGE_H;
   const ctx = c.getContext('2d');
   if (!ctx) return;
-  ctx.fillStyle = '#fbf6ea';
+  const bg = ctx.createLinearGradient(0, 0, 0, IMAGE_H);
+  bg.addColorStop(0, '#fff7ef');
+  bg.addColorStop(1, '#ffe6d6');
+  ctx.fillStyle = bg;
   ctx.fillRect(0, 0, IMAGE_W, IMAGE_H);
 
   const font = 'system-ui, "Hiragino Sans", "Noto Sans JP", sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillStyle = '#c98a12';
   ctx.font = `900 120px ${font}`;
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = 22;
+  ctx.strokeStyle = '#ffffff';
+  ctx.strokeText(t('meta.name'), IMAGE_W / 2, 190);
+  ctx.fillStyle = '#e0643f';
   ctx.fillText(t('meta.name'), IMAGE_W / 2, 190);
-  ctx.fillStyle = '#5f6779';
-  ctx.font = `600 34px ${font}`;
+  ctx.fillStyle = '#9a6a55';
+  ctx.font = `700 34px ${font}`;
   ctx.fillText(t('meta.tagline'), IMAGE_W / 2, 255);
 
   // お金の段を小さい方から並べる（大きさの増え方が分かるように）＋かぶ

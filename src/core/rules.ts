@@ -18,6 +18,11 @@ export function yenText(yen: number, u: MoneyUnits): string {
   return `${f(yen)}${u.symbol}`;
 }
 
+/** 金額を1円単位で：24,830,123円（2026-11-26 オーナー指定：合計・現金・株などは1円単位） */
+export function yenFull(yen: number, u: Pick<MoneyUnits, 'symbol' | 'locale'>): string {
+  return `${Math.floor(yen).toLocaleString(u.locale)}${u.symbol}`;
+}
+
 /** 株価の丸め：上 sigDigits けた、最小 minUnit 円 */
 export function roundPrice(p: number, { minUnit, sigDigits }: { minUnit: number; sigDigits: number }): number {
   p = Math.max(p, minUnit);

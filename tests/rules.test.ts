@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { config, currency, messagesByLocale } from '../src/data';
 import { buyOne, cashOf, okuRadius, roundPrice, titleFor, turnipColor, turnipLean } from '../src/core/rules';
-import { money } from '../src/money';
+import { money, yen } from '../src/money';
 
 const R0 = currency.tiers[currency.tiers.length - 1]!.radius;
 const titleName = (p: Partial<Parameters<typeof titleFor>[0]> & { total: number }) =>
@@ -17,6 +17,16 @@ describe('T-02 丸め・表示・色・称号', () => {
     expect(okuRadius(2, R0, currency.topTier)).toBeCloseTo(114.4, 10);
     expect(okuRadius(3, R0, currency.topTier)).toBe(120);
     expect(okuRadius(5, R0, currency.topTier)).toBe(120);
+  });
+
+  it.each([
+    [0, '0円'],
+    [9800, '9,800円'],
+    [24_830_123, '24,830,123円'],
+    [1_234_567_890, '1,234,567,890円'],
+    [5000.6, '5,000円'],
+  ])('合計・現金・株は1円単位 %i → %s', (v, want) => {
+    expect(yen(v)).toBe(want);
   });
 
   it.each([

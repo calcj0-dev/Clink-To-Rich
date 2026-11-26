@@ -2,7 +2,7 @@
 
 import { config } from '../../data';
 import { t } from '../../i18n';
-import { money } from '../../money';
+import { yen } from '../../money';
 import { load } from '../../storage';
 import { APP_VERSION } from '../../version';
 import type { ScreenFactory } from '../app';
@@ -21,7 +21,7 @@ export const titleScreen: ScreenFactory = (app) => {
     titleArt(),
     button(t('title.start'), () => app.go('play'), 'btn btn-primary btn-start'),
     linkButton(t('title.how'), openHow),
-    best > 0 ? h('p', { className: 'best', text: t('title.best', { total: money(best) }) }) : null,
+    best > 0 ? h('p', { className: 'best', text: t('title.best', { total: yen(best) }) }) : null,
     h('div', { className: 'title-foot' }, [
       h('p', { className: 'disclaimer', text: t('title.disclaimer') }),
       h('p', {}, [externalLink(t('title.portal'), config.links.portal)]),

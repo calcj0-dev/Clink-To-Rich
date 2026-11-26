@@ -6,7 +6,7 @@ import { createGame, type GameEvent } from '../../core/game';
 import { playSound } from '../../audio';
 import { setLastResult } from '../../game/lastResult';
 import { t } from '../../i18n';
-import { money } from '../../money';
+import { money, yen } from '../../money';
 import { settings } from '../../settings';
 import { load, save } from '../../storage';
 import type { ScreenFactory } from '../app';
@@ -153,7 +153,7 @@ export const playScreen: ScreenFactory = (app) => {
     overlay.replaceChildren(
       h('div', { className: 'over-card' }, [
         h('p', { className: 'over-title', text: t('events.over') }),
-        h('p', { className: 'over-total', text: t('result.total', { yen: money(result.total) }) }),
+        h('p', { className: 'over-total', text: t('result.total', { yen: yen(result.total) }) }),
       ]),
     );
     overlay.hidden = false;

@@ -4,14 +4,14 @@ import { config } from '../data';
 import type { Result } from '../core/game';
 import { t } from '../i18n';
 import type { MessageKey } from '../i18n/types';
-import { money } from '../money';
+import { yen } from '../money';
 
 /** 投稿文（URL は含めない。X の投稿画面・Web Share には URL を別に渡す） */
 export function postText(r: Pick<Result, 'total' | 'cash' | 'stock' | 'title'>): string {
   return t('share.text', {
-    total: money(r.total),
-    cash: money(r.cash),
-    stock: money(r.stock),
+    total: yen(r.total),
+    cash: yen(r.cash),
+    stock: yen(r.stock),
     title: t(`titles.${r.title}` as MessageKey),
     hashtag: config.hashtag,
   });

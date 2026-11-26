@@ -4,7 +4,7 @@ import { siteUrl } from '../data';
 import type { LastResult } from '../game/lastResult';
 import { t } from '../i18n';
 import type { MessageKey } from '../i18n/types';
-import { money } from '../money';
+import { yen } from '../money';
 import { drawSnapshot } from '../ui/render';
 
 export const IMAGE_W = 1200;
@@ -27,10 +27,12 @@ export function drawResultImage(canvas: HTMLCanvasElement, r: LastResult): void 
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
-  ctx.fillStyle = '#ffffff';
+  // 見た目は案B「あたたか」（2026-11-26）：クリームからうすいコーラルへ
+  const bg = ctx.createLinearGradient(0, 0, 0, IMAGE_H);
+  bg.addColorStop(0, '#fff7ef');
+  bg.addColorStop(1, '#ffe6d6');
+  ctx.fillStyle = bg;
   ctx.fillRect(0, 0, IMAGE_W, IMAGE_H);
-  ctx.fillStyle = '#f3ecdb';
-  ctx.fillRect(0, 0, IMAGE_W, 10);
 
   // 左：貯金箱の中身
   const boxH = 520;
@@ -47,21 +49,21 @@ export function drawResultImage(canvas: HTMLCanvasElement, r: LastResult): void 
   const maxW = IMAGE_W - x - 48;
   ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
-  fitText(ctx, t('meta.name'), x, 112, 44, 800, maxW, '#c98a12');
-  fitText(ctx, t('result.total', { yen: money(r.total) }), x, 222, 76, 800, maxW, '#1a1f2b');
-  fitText(ctx, t('result.breakdown', { cash: money(r.cash), stock: money(r.stock) }), x, 278, 32, 500, maxW, '#5f6779');
+  fitText(ctx, t('meta.name'), x, 112, 44, 900, maxW, '#e0643f');
+  fitText(ctx, t('result.total', { yen: yen(r.total) }), x, 222, 76, 800, maxW, '#1a1f2b');
+  fitText(ctx, t('result.breakdown', { cash: yen(r.cash), stock: yen(r.stock) }), x, 278, 32, 500, maxW, '#8a6a5c');
 
-  ctx.fillStyle = '#fbf6ea';
+  ctx.fillStyle = '#ffffff';
   ctx.beginPath();
   ctx.roundRect(x - 20, 320, maxW + 40, 150, 18);
   ctx.fill();
-  fitText(ctx, t('result.title', { title: t(`titles.${r.title}` as MessageKey) }), x, 386, 46, 800, maxW, '#c98a12');
+  fitText(ctx, t('result.title', { title: t(`titles.${r.title}` as MessageKey) }), x, 386, 46, 800, maxW, '#e0643f');
   fitText(ctx, t(`titleLines.${r.title}` as MessageKey), x, 438, 28, 500, maxW, '#1a1f2b');
 
   // 下：注意書きと URL
-  fitText(ctx, t('image.note'), x, 548, 22, 500, maxW, '#5f6779');
+  fitText(ctx, t('image.note'), x, 548, 22, 500, maxW, '#8a6a5c');
   const url = siteUrl().replace(/^https?:\/\//, '').replace(/\/$/, '');
-  fitText(ctx, url, x, 584, 24, 600, maxW, '#5f6779');
+  fitText(ctx, url, x, 584, 24, 600, maxW, '#8a6a5c');
 }
 
 export function resultImageBlob(r: LastResult): Promise<Blob | null> {

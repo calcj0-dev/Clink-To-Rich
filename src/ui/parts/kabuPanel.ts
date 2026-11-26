@@ -5,7 +5,7 @@ import { playSound } from '../../audio';
 import type { Game } from '../../core/game';
 import { turnipColor } from '../../core/rules';
 import { t } from '../../i18n';
-import { money } from '../../money';
+import { money, yen } from '../../money';
 import { button, h } from '../dom';
 import { settings } from '../../settings';
 import { drawTurnip } from '../render';
@@ -66,9 +66,9 @@ export function openKabuPanel(game: Game, onClose: () => void): void {
     const play = game.play();
     price.textContent = t('buy.price', { yen: money(game.price()) });
     held.textContent = t('kabu.held', { n: play.shares });
-    avg.textContent = play.shares > 0 ? t('kabu.avg', { yen: money(game.avgCost()) }) : '';
+    avg.textContent = play.shares > 0 ? t('kabu.avg', { yen: yen(game.avgCost()) }) : '';
     avg.hidden = play.shares === 0;
-    cash.textContent = t('kabu.cash', { yen: money(game.cash()) });
+    cash.textContent = t('kabu.cash', { yen: yen(game.cash()) });
     buyBtn.disabled = !game.canBuy();
     paintChart(); // 平均取得価額の線を合わせる
     const ictx = icon.getContext('2d');

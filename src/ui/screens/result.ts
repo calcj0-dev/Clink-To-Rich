@@ -7,7 +7,7 @@ import { config, currency } from '../../data';
 import { getLastResult } from '../../game/lastResult';
 import { t } from '../../i18n';
 import type { MessageKey } from '../../i18n/types';
-import { money } from '../../money';
+import { money, yen } from '../../money';
 import type { ScreenFactory } from '../app';
 import { button, externalLink, h, linkButton } from '../dom';
 import { postText } from '../../share/postText';
@@ -61,16 +61,16 @@ export const resultScreen: ScreenFactory = (app) => {
     r.shares === 0
       ? t('result.noStock')
       : r.stockGain >= 0
-        ? t('result.stockGain', { yen: money(r.stockGain), paid: money(r.spent) })
-        : t('result.stockLoss', { yen: money(-r.stockGain), paid: money(r.spent) });
+        ? t('result.stockGain', { yen: yen(r.stockGain), paid: yen(r.spent) })
+        : t('result.stockLoss', { yen: yen(-r.stockGain), paid: yen(r.spent) });
 
   const el = h('section', { className: 'screen screen-result' }, [
     h('h1', { className: 'result-heading', text: t('result.heading') }),
     h('div', { className: 'result-top' }, [
       box,
       h('div', { className: 'result-nums' }, [
-        h('p', { className: 'result-total', text: t('result.total', { yen: money(r.total) }) }),
-        h('p', { className: 'result-sub', text: t('result.breakdown', { cash: money(r.cash), stock: money(r.stock) }) }),
+        h('p', { className: 'result-total', text: t('result.total', { yen: yen(r.total) }) }),
+        h('p', { className: 'result-sub', text: t('result.breakdown', { cash: yen(r.cash), stock: yen(r.stock) }) }),
         h('p', { className: 'result-sub', text: t('result.drops', { n: r.drops }) }),
         r.maxOku > 0 ? h('p', { className: 'result-sub', text: t('result.bigOku', { yen: money(r.maxOku * currency.topTier.unitValue) }) }) : null,
         h('p', { className: 'result-sub', text: stockLine }),
@@ -80,7 +80,7 @@ export const resultScreen: ScreenFactory = (app) => {
       h('p', { className: 'result-title-name', text: t('result.title', { title: t(`titles.${r.title}` as MessageKey) }) }),
       h('p', { className: 'result-title-line', text: t(`titleLines.${r.title}` as MessageKey) }),
     ]),
-    h('p', { className: r.newBest ? 'result-best new' : 'result-best', text: r.newBest ? t('result.newBest') : t('result.best', { yen: money(r.best) }) }),
+    h('p', { className: r.newBest ? 'result-best new' : 'result-best', text: r.newBest ? t('result.newBest') : t('result.best', { yen: yen(r.best) }) }),
     h('div', { className: 'result-actions' }, [shareBtn, saveBtn]),
     button(t('result.retry'), () => app.go('play'), 'btn btn-primary btn-retry'),
     linkButton(t('result.toTitle'), () => app.go('title')),

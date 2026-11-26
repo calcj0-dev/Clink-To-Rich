@@ -2,7 +2,7 @@
 
 import type { Game } from '../../core/game';
 import { t } from '../../i18n';
-import { money } from '../../money';
+import { yen } from '../../money';
 import { h } from '../dom';
 import { drawMoney } from '../render';
 import { soundButton } from './soundButton';
@@ -36,9 +36,9 @@ export function hud(menuButton: HTMLElement) {
   ]);
 
   function update(game: Game) {
-    setText(total, t('hud.total', { yen: money(game.total()) }));
-    setText(cash, t('hud.cash', { yen: money(game.cash()) }));
-    setText(stock, `${t('hud.stock', { yen: money(game.stockValue()) })} (${t('hud.shares', { n: game.play().shares })})`);
+    setText(total, t('hud.total', { yen: yen(game.total()) }));
+    setText(cash, t('hud.cash', { yen: yen(game.cash()) }));
+    setText(stock, `${t('hud.stock', { yen: yen(game.stockValue()) })} (${t('hud.shares', { n: game.play().shares })})`);
     if (nctx && shownNext !== game.nextTier) {
       shownNext = game.nextTier;
       nctx.setTransform(dpr, 0, 0, dpr, 0, 0);

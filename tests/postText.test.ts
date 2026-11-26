@@ -3,9 +3,9 @@ import { describe, expect, it } from 'vitest';
 import { postText, X_LIMIT, xLength } from '../src/share/postText';
 
 describe('投稿文', () => {
-  it('設計書の例と同じ文になる', () => {
-    expect(postText({ total: 24_830_000, cash: 1_830_000, stock: 23_000_000, title: 't_rich' })).toBe(
-      '億までチャリンで2,483万円（現金 183万円／株 2,300万円）。称号：小金持ち #億までチャリン',
+  it('金額は1円単位（2026-11-26 オーナー指定）', () => {
+    expect(postText({ total: 24_830_123, cash: 1_830_123, stock: 23_000_000, title: 't_rich' })).toBe(
+      '億までチャリンで24,830,123円（現金 1,830,123円／株 23,000,000円）。称号：小金持ち #億までチャリン',
     );
   });
 
