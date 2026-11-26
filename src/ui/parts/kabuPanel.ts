@@ -5,7 +5,7 @@ import { playSound } from '../../audio';
 import type { Game } from '../../core/game';
 import { turnipColor } from '../../core/rules';
 import { t } from '../../i18n';
-import { money, yen } from '../../money';
+import { yen } from '../../money';
 import { button, h } from '../dom';
 import { settings } from '../../settings';
 import { drawTurnip } from '../render';
@@ -40,7 +40,7 @@ export function openKabuPanel(game: Game, onClose: () => void): void {
   const buyBtn = button(t('kabu.buy'), () => {
     const p = game.price();
     if (game.buy()) {
-      status.textContent = t('buy.done', { yen: money(p) });
+      status.textContent = t('buy.done', { yen: yen(p) });
       playSound(game.config.sounds.buy);
     }
     refresh();
@@ -64,7 +64,7 @@ export function openKabuPanel(game: Game, onClose: () => void): void {
 
   function refresh() {
     const play = game.play();
-    price.textContent = t('buy.price', { yen: money(game.price()) });
+    price.textContent = t('buy.price', { yen: yen(game.price()) });
     held.textContent = t('kabu.held', { n: play.shares });
     avg.textContent = play.shares > 0 ? t('kabu.avg', { yen: yen(game.avgCost()) }) : '';
     avg.hidden = play.shares === 0;

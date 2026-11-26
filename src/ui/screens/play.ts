@@ -6,7 +6,7 @@ import { createGame, type GameEvent } from '../../core/game';
 import { playSound } from '../../audio';
 import { setLastResult } from '../../game/lastResult';
 import { t } from '../../i18n';
-import { money, yen } from '../../money';
+import { yen } from '../../money';
 import { settings } from '../../settings';
 import { load, save } from '../../storage';
 import type { ScreenFactory } from '../app';
@@ -189,7 +189,7 @@ export const playScreen: ScreenFactory = (app) => {
       drawBox(ctx, game, { now, showHeld: game.canDrop() });
     }
     top.update(game);
-    const priceText = t('buy.price', { yen: money(game.price()) });
+    const priceText = t('buy.price', { yen: yen(game.price()) });
     if (buyPrice.textContent !== priceText) buyPrice.textContent = priceText;
     buyBtn.disabled = game.over;
     raf = requestAnimationFrame(frame);
