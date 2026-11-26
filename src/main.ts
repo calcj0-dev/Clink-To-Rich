@@ -19,6 +19,9 @@ if (root) {
   // 開発用：?screen=play で遊ぶ画面、?screen=image・og で画像を直接開く（公開版では無視する）
   const q = import.meta.env.DEV ? new URLSearchParams(location.search) : null;
   const screen = q?.get('screen');
+  // 開発用：?theme=a・b・c で見た目の見本を切り替える
+  const theme = q?.get('theme');
+  if (theme) document.documentElement.dataset.theme = theme;
   if (q && (screen === 'image' || screen === 'og')) {
     void import('./dev/preview').then((m) =>
       screen === 'og'

@@ -9,6 +9,7 @@ import type { ScreenFactory } from '../app';
 import { button, externalLink, h, linkButton } from '../dom';
 import { openHow, openPrivacy } from '../modals';
 import { soundButton } from '../parts/soundButton';
+import { titleArt } from '../parts/titleArt';
 
 export const titleScreen: ScreenFactory = (app) => {
   const best = Number(load('best', '0'));
@@ -17,6 +18,7 @@ export const titleScreen: ScreenFactory = (app) => {
     h('div', { className: 'top-bar' }, [h('span', { className: 'version', text: t('title.version', { version: APP_VERSION }) }), sound.el]),
     h('h1', { className: 'title', text: t('meta.name') }),
     h('p', { className: 'tagline', text: t('meta.tagline') }),
+    titleArt(),
     button(t('title.start'), () => app.go('play'), 'btn btn-primary btn-start'),
     linkButton(t('title.how'), openHow),
     best > 0 ? h('p', { className: 'best', text: t('title.best', { total: money(best) }) }) : null,

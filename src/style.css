@@ -689,3 +689,180 @@ button {
 .evo-line strong {
   color: var(--text);
 }
+
+/* ---- タイトルの絵 ---- */
+.title-art {
+  width: min(340px, 100%);
+  aspect-ratio: 340 / 200;
+  margin: 18px auto 0;
+  display: block;
+}
+
+.screen-title .btn-start {
+  margin-top: 18px;
+}
+
+/* =========================================================
+   見た目の見本（開発用。?theme=a・b・c）。決まったら本番の形にする
+   ========================================================= */
+
+/* --- A 金ピカ（成金）：濃い紺に金 --- */
+[data-theme='a'] body {
+  background: #0b1430;
+}
+[data-theme='a'] #app {
+  background: radial-gradient(120% 70% at 50% 0%, #22346b 0%, #0f1b3d 55%, #0b1430 100%);
+  color: #f6ecd2;
+}
+[data-theme='a'] .title {
+  background: linear-gradient(180deg, #fff6cf 0%, #f2c94c 45%, #b8861b 55%, #f7dd84 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 3px 0 #5b3f06) drop-shadow(0 0 18px rgba(242, 201, 76, 0.45));
+  font-size: 46px;
+  font-weight: 900;
+}
+[data-theme='a'] .tagline,
+[data-theme='a'] .version,
+[data-theme='a'] .disclaimer,
+[data-theme='a'] .link,
+[data-theme='a'] .icon-btn {
+  color: #c9c3b0;
+}
+[data-theme='a'] .btn-primary,
+[data-theme='a'] .btn-start {
+  background: linear-gradient(180deg, #ffe58a 0%, #e6b325 50%, #b8861b 100%);
+  border: none;
+  color: #3b2a05;
+  box-shadow: 0 4px 0 #7a5a12, 0 8px 20px rgba(242, 201, 76, 0.35);
+}
+[data-theme='a'] .hud {
+  background: linear-gradient(180deg, #16244f, #0f1b3d);
+  border-bottom: 2px solid #c9a24a;
+  margin: 0 -8px;
+  padding: 8px 12px;
+}
+[data-theme='a'] .hud-total {
+  color: #f7dd84;
+}
+[data-theme='a'] .hud-sub,
+[data-theme='a'] .hud-next {
+  color: #c9c3b0;
+}
+[data-theme='a'] .box-canvas {
+  border-color: #c9a24a;
+  box-shadow: 0 0 24px rgba(242, 201, 76, 0.18);
+}
+[data-theme='a'] .btn-money {
+  background: #16244f;
+  border-color: #c9a24a;
+  color: #f7dd84;
+}
+
+/* --- B あたたか貯金箱：クリームとコーラル、まるい形 --- */
+[data-theme='b'] body {
+  background: #ffe9dc;
+}
+[data-theme='b'] #app {
+  background: linear-gradient(180deg, #fff7ef 0%, #ffe6d6 100%);
+}
+[data-theme='b'] .title {
+  color: #e0643f;
+  font-weight: 900;
+  font-size: 46px;
+  -webkit-text-stroke: 8px #ffffff;
+  paint-order: stroke fill;
+  filter: drop-shadow(0 4px 0 rgba(224, 100, 63, 0.35));
+}
+[data-theme='b'] .tagline {
+  color: #9a6a55;
+  font-weight: 700;
+}
+[data-theme='b'] .btn-primary,
+[data-theme='b'] .btn-start {
+  background: #ff7a59;
+  border: none;
+  color: #fff;
+  box-shadow: 0 5px 0 #d4553a;
+}
+[data-theme='b'] .hud {
+  background: #ffffff;
+  border-radius: 0 0 18px 18px;
+  box-shadow: 0 4px 14px rgba(224, 100, 63, 0.15);
+  margin: 0 -8px 6px;
+  padding: 8px 12px;
+}
+[data-theme='b'] .hud-total {
+  color: #e0643f;
+}
+[data-theme='b'] .box-canvas {
+  border: 4px solid #e8a68a;
+  border-top: none;
+  border-radius: 0 0 26px 26px;
+}
+[data-theme='b'] .btn-money {
+  background: #fff;
+  border-color: #f3c3ad;
+  color: #c4573a;
+}
+
+/* --- C ポップ：黄色い放射線と赤、太いふち --- */
+[data-theme='c'] body {
+  background: #ffcf33;
+}
+[data-theme='c'] #app {
+  background:
+    repeating-conic-gradient(from 0deg at 50% 22%, #ffd84d 0deg 10deg, #ffc61a 10deg 20deg);
+}
+[data-theme='c'] .screen-play {
+  background: #fff6d6;
+}
+[data-theme='c'] .title {
+  color: #e8322b;
+  font-weight: 900;
+  font-size: 48px;
+  -webkit-text-stroke: 10px #1a1f2b;
+  paint-order: stroke fill;
+  filter: drop-shadow(0 5px 0 #1a1f2b);
+}
+[data-theme='c'] .tagline {
+  display: inline-block;
+  align-self: center;
+  background: #1a1f2b;
+  color: #ffd84d;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+[data-theme='c'] .btn-primary,
+[data-theme='c'] .btn-start {
+  background: #e8322b;
+  border: 3px solid #1a1f2b;
+  color: #fff;
+  box-shadow: 0 5px 0 #1a1f2b;
+}
+[data-theme='c'] .hud {
+  background: #ffd84d;
+  border-bottom: 3px solid #1a1f2b;
+  margin: 0 -8px 6px;
+  padding: 8px 12px;
+}
+[data-theme='c'] .hud-total {
+  color: #1a1f2b;
+  font-size: 24px;
+}
+[data-theme='c'] .box-canvas {
+  border: 4px solid #1a1f2b;
+  border-top: none;
+}
+[data-theme='c'] .btn-buy {
+  border: 3px solid #1a1f2b;
+  box-shadow: 0 4px 0 #1a1f2b;
+}
+[data-theme='c'] .btn-money {
+  background: #fff;
+  border: 3px solid #1a1f2b;
+  color: #1a1f2b;
+  box-shadow: 0 4px 0 #1a1f2b;
+}
